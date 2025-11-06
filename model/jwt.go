@@ -1,8 +1,12 @@
 package model
 
-import "github.com/golang-jwt/jwt"
+import (
+	"os"
 
-var JwtKey = []byte("secret-key")
+	"github.com/golang-jwt/jwt"
+)
+
+var JwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 type Claims struct {
 	UserID int `json:"user_id"`

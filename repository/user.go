@@ -23,7 +23,7 @@ func (u *userRepository) Add(user model.User) error {
 	if err := u.db.Create(&user).Error; err != nil {
 		return err
 	}
-	return nil // TODO: replace this
+	return nil 
 }
 
 func (u *userRepository) CheckAvail(user model.User) (model.User, error) {
@@ -33,7 +33,7 @@ func (u *userRepository) CheckAvail(user model.User) (model.User, error) {
 		return model.User{}, err
 	}
 
-	return userExist, nil // TODO: replace this
+	return userExist, nil 
 }
 
 func (u *userRepository) GetUserByID(id int) (model.User, error) {
@@ -43,5 +43,5 @@ func (u *userRepository) GetUserByID(id int) (model.User, error) {
 		return model.User{}, err
 	}
 
-	return user, nil // TODO: replace this
+	return user, nil 
 }

@@ -9,29 +9,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type StudentAPI interface {
-	CreateStudent(c *gin.Context)
-	GetStudentByID(c *gin.Context)
-	GetAllStudents(c *gin.Context)
-	UpdateStudent(c *gin.Context)
-	DeleteStudent(c *gin.Context)
-	CreateManyStudents(c *gin.Context)
+type ParentAPI interface {
+	CreateParent(c *gin.Context)
+	GetParentByID(c *gin.Context)
+	GetAllParents(c *gin.Context)
+	UpdateParent(c *gin.Context)
+	DeleteParent(c *gin.Context)
 }
 
-type studentAPI struct {
-	studentService service.StudentService
+type parentAPI struct {
+	parentService service.ParentService
 }
 
-func NewStudentAPI(studentService service.StudentService) *studentAPI {
-	return &studentAPI{studentService}
+func NewParentAPI(parentService service.ParentService) *parentAPI {
+	return &parentAPI{parentService}
 }
 
 // ====================
-// CREATE STUDENT
+// CREATE PARENT
 // ====================
-func (s *studentAPI) CreateStudent(c *gin.Context) {
-	var student model.Student
-	if err := c.ShouldBindJSON(&student); err != nil {
+func (p *parentAPI) CreateParent(c *gin.Context) {
+	var parent model.Parent
+	if err := c.ShouldBindJSON(&parent); err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusBadRequest,
@@ -45,12 +44,10 @@ func (s *studentAPI) CreateStudent(c *gin.Context) {
 
 	// Minimal validation
 	errors := make(map[string]string)
-	if student.FullName == "" {
-		errors["full_name"] = "Full name is required"
+	if *parent.FatherName == "" || *parent.MotherName == ""{
+		errors["name"] = "parents name is required"
 	}
-	if student.Gender == "" {
-		errors["gender"] = "Gender is required"
-	}
+
 	if len(errors) > 0 {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
@@ -61,11 +58,11 @@ func (s *studentAPI) CreateStudent(c *gin.Context) {
 		return
 	}
 
-	if err := s.studentService.CreateStudent(&student); err != nil {
+	if err := p.parentService.CreateParent(&parent); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to create student",
+			Message: "Failed to create parent",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -74,49 +71,32 @@ func (s *studentAPI) CreateStudent(c *gin.Context) {
 	c.JSON(http.StatusCreated, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusCreated,
-		Message: "Student created successfully",
-		Data:    student,
+		Message: "Parent created successfully",
+		Data:    parent,
 	})
 }
 
-func (s *studentAPI) CreateManyStudents(c *gin.Context) {
-	var students []model.Student
-	if err := c.ShouldBindJSON(&students); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	for _, student := range students {
-		if err := s.studentService.CreateStudent(&student); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "All students created successfully"})
-}
-
 // ====================
-// GET STUDENT BY ID
+// GET PARENT BY ID
 // ====================
-func (s *studentAPI) GetStudentByID(c *gin.Context) {
+func (p *parentAPI) GetParentByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusBadRequest,
-			Message: "Invalid student ID",
+			Message: "Invalid parent ID",
 		})
 		return
 	}
 
-	student, err := s.studentService.GetStudentByID(id)
+	parent, err := p.parentService.GetParentByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusNotFound,
-			Message: "Student not found",
+			Message: "Parent not found",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -125,27 +105,27 @@ func (s *studentAPI) GetStudentByID(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Student retrieved successfully",
-		Data:    student,
+		Message: "Parent retrieved successfully",
+		Data:    parent,
 	})
 }
 
 // ====================
-// GET ALL STUDENTS
+// GET ALL PARENTS
 // ====================
-func (s *studentAPI) GetAllStudents(c *gin.Context) {
+func (p *parentAPI) GetAllParents(c *gin.Context) {
 	limitParam := c.DefaultQuery("limit", "10")
 	offsetParam := c.DefaultQuery("offset", "0")
 
 	limit, _ := strconv.Atoi(limitParam)
 	offset, _ := strconv.Atoi(offsetParam)
 
-	students, err := s.studentService.GetAllStudents(limit, offset)
+	parents, err := p.parentService.GetAllParents(limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to retrieve students",
+			Message: "Failed to retrieve parents",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -154,28 +134,28 @@ func (s *studentAPI) GetAllStudents(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Students retrieved successfully",
-		Data:    students,
+		Message: "Parents retrieved successfully",
+		Data:    parents,
 	})
 }
 
 // ====================
-// UPDATE STUDENT
+// UPDATE PARENT
 // ====================
-func (s *studentAPI) UpdateStudent(c *gin.Context) {
+func (p *parentAPI) UpdateParent(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusBadRequest,
-			Message: "Invalid student ID",
+			Message: "Invalid parent ID",
 		})
 		return
 	}
 
-	var student model.Student
-	if err := c.ShouldBindJSON(&student); err != nil {
+	var parent model.Parent
+	if err := c.ShouldBindJSON(&parent); err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusBadRequest,
@@ -185,11 +165,11 @@ func (s *studentAPI) UpdateStudent(c *gin.Context) {
 		return
 	}
 
-	if err := s.studentService.UpdateStudent(id, &student); err != nil {
+	if err := p.parentService.UpdateParent(id, &parent); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to update student",
+			Message: "Failed to update parent",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -198,31 +178,31 @@ func (s *studentAPI) UpdateStudent(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Student updated successfully",
-		Data:    student,
+		Message: "Parent updated successfully",
+		Data:    parent,
 	})
 }
 
 // ====================
-// DELETE STUDENT
+// DELETE PARENT
 // ====================
-func (s *studentAPI) DeleteStudent(c *gin.Context) {
+func (p *parentAPI) DeleteParent(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusBadRequest,
-			Message: "Invalid student ID",
+			Message: "Invalid parent ID",
 		})
 		return
 	}
 
-	if err := s.studentService.DeleteStudent(id); err != nil {
+	if err := p.parentService.DeleteParent(id); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to delete student",
+			Message: "Failed to delete parent",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -231,6 +211,6 @@ func (s *studentAPI) DeleteStudent(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Student deleted successfully",
+		Message: "Parent deleted successfully",
 	})
 }

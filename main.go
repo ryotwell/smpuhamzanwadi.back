@@ -25,6 +25,7 @@ import (
 type APIHandler struct {
 	UserAPIHandler    api.UserAPI
 	StudentAPIHandler api.StudentAPI
+	ParentAPIHandler api.ParentAPI
 }
 
 func main() {
@@ -76,37 +77,37 @@ func main() {
 	// // Migrasi tabel
 	// conn.AutoMigrate(&model.User{}, &model.Student{})
 
-	// // Daftarkan semua route dan handler
+	// // Route
 	// router = RunServer(router, conn)
 
-	// fmt.Println("✅ Server is running on port 8080")
+	// fmt.Println("Server is running on port 8080")
 	// if err := router.Run(":8080"); err != nil {
 	// 	panic(err)
 	// }
 
-	// Ambil DATABASE_URL
+	// Get DATABASE_URL
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
-		panic("DATABASE_URL tidak ditemukan. Pastikan environment variable sudah diatur di Railway.")
+		panic("DATABASE_URL tidak ditemukan.")
 	}
 
-	// Koneksi ke DB
+	// Connect to DB
 	database := db.NewDB()
 	conn, err := database.ConnectURL(databaseURL)
 	if err != nil {
 		panic(err)
 	}
 
-	// Migrasi tabel (opsional, tergantung kebutuhan)
-	conn.AutoMigrate(&model.User{}, &model.Student{})
+	// Migration
+	conn.AutoMigrate(&model.User{}, &model.Student{}, &model.Parent{})
 
-	// Daftarkan semua route dan handler
+	// Route
 	router = RunServer(router, conn)
 
-	// Ambil PORT dari Railway
+	// Get Port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // fallback jika dijalankan lokal
+		port = "8080"
 	}
 
 	fmt.Printf("✅ Server is running on port %s\n", port)
@@ -117,27 +118,27 @@ func main() {
 }
 
 func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
-	// Pastikan conn bertipe *gorm.DB
 	dbConn := conn.(*gorm.DB)
 
-	// Inisialisasi Repository (pakai GORM)
 	userRepo := repo.NewUserRepo(dbConn)
 	studentRepo := repo.NewStudentRepo(dbConn)
+	parentRepo := repo.NewParentRepo(dbConn)
 
-	// Inisialisasi Service
 	userService := service.NewUserService(userRepo)
-	studentService := service.NewStudentService(studentRepo)
+	studentService := service.NewStudentService(studentRepo, parentRepo)
+	parentService := service.NewParentService(parentRepo)
 
-	// Inisialisasi API Handler
 	userAPIHandler := api.NewUserAPI(userService)
 	studentAPIHandler := api.NewStudentAPI(studentService)
+	parentAPIHandler := api.NewParentAPI(parentService)
 
 	apiHandler := APIHandler{
 		UserAPIHandler:    userAPIHandler,
 		StudentAPIHandler: studentAPIHandler,
+		ParentAPIHandler: parentAPIHandler,
 	}
 
-	// ROUTES
+	// ROUTES //
 
 	// User routes
 	user := r.Group("/user")
@@ -151,15 +152,27 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	}
 
 	// Student routes
-	students := r.Group("/students")
+	student := r.Group("/student")
 	{
-		students.Use(middleware.Auth())
-		students.GET("", apiHandler.StudentAPIHandler.FetchAllStudent)
-		students.GET("/:id", apiHandler.StudentAPIHandler.FetchStudentByID)
-		students.POST("", apiHandler.StudentAPIHandler.StoreStudent)
-		students.PUT("/:id", apiHandler.StudentAPIHandler.UpdateStudent)
-		students.DELETE("/:id", apiHandler.StudentAPIHandler.DeleteStudent)
-		students.GET("/class", apiHandler.StudentAPIHandler.FetchStudentWithClass)
+		student.Use(middleware.Auth())
+		student.POST("/add", apiHandler.StudentAPIHandler.CreateStudent)
+		student.POST("/bulk-add", apiHandler.StudentAPIHandler.CreateManyStudents)
+		student.GET("/get/:id", apiHandler.StudentAPIHandler.GetStudentByID)
+		student.GET("/get-all", apiHandler.StudentAPIHandler.GetAllStudents)
+		student.PUT("/update/:id", apiHandler.StudentAPIHandler.UpdateStudent)
+		student.DELETE("/delete/:id", apiHandler.StudentAPIHandler.DeleteStudent)
+
+	}
+
+	// Parent routes
+	parent := r.Group("/parent")
+	{
+		parent.Use(middleware.Auth())
+		parent.POST("/add", apiHandler.ParentAPIHandler.CreateParent)
+		parent.GET("/get-all", apiHandler.ParentAPIHandler.GetAllParents)
+		parent.GET("/get/:id", apiHandler.ParentAPIHandler.GetParentByID)
+		parent.PUT("/update/:id", apiHandler.ParentAPIHandler.UpdateParent)
+		parent.DELETE("/delete/:id", apiHandler.ParentAPIHandler.DeleteParent)
 	}
 
 	return r

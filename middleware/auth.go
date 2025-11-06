@@ -33,7 +33,7 @@ func Auth() gin.HandlerFunc {
 			if err == jwt.ErrSignatureInvalid {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			} else {
-				ctx.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "bad requesto"})
 			}
 			ctx.Abort()
 			return
