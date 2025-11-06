@@ -25,7 +25,8 @@ import (
 type APIHandler struct {
 	UserAPIHandler    api.UserAPI
 	StudentAPIHandler api.StudentAPI
-	ParentAPIHandler api.ParentAPI
+	ParentAPIHandler  api.ParentAPI
+	PostAPIHandler    api.PostAPI
 }
 
 func main() {
@@ -99,7 +100,7 @@ func main() {
 	}
 
 	// Migration
-	conn.AutoMigrate(&model.User{}, &model.Student{}, &model.Parent{})
+	conn.AutoMigrate(&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{})
 
 	// Route
 	router = RunServer(router, conn)
@@ -123,19 +124,23 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	userRepo := repo.NewUserRepo(dbConn)
 	studentRepo := repo.NewStudentRepo(dbConn)
 	parentRepo := repo.NewParentRepo(dbConn)
+	postRepo := repo.NewPostRepo(dbConn)
 
 	userService := service.NewUserService(userRepo)
 	studentService := service.NewStudentService(studentRepo, parentRepo)
 	parentService := service.NewParentService(parentRepo)
+	postService := service.NewPostService(postRepo)
 
 	userAPIHandler := api.NewUserAPI(userService)
 	studentAPIHandler := api.NewStudentAPI(studentService)
 	parentAPIHandler := api.NewParentAPI(parentService)
+	postAPIHandler := api.NewPostAPI(postService)
 
 	apiHandler := APIHandler{
 		UserAPIHandler:    userAPIHandler,
 		StudentAPIHandler: studentAPIHandler,
-		ParentAPIHandler: parentAPIHandler,
+		ParentAPIHandler:  parentAPIHandler,
+		PostAPIHandler:    postAPIHandler,
 	}
 
 	// ROUTES //
@@ -173,6 +178,17 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		parent.GET("/get/:id", apiHandler.ParentAPIHandler.GetParentByID)
 		parent.PUT("/update/:id", apiHandler.ParentAPIHandler.UpdateParent)
 		parent.DELETE("/delete/:id", apiHandler.ParentAPIHandler.DeleteParent)
+	}
+
+	// Post routes
+	post := r.Group("/post")
+	{
+		post.Use(middleware.Auth())
+		post.POST("/add", apiHandler.PostAPIHandler.CreatePost)
+		post.GET("/get-all", apiHandler.PostAPIHandler.GetAllPosts)
+		post.GET("/get/:id", apiHandler.PostAPIHandler.GetPostByID)
+		post.PUT("/update/:id", apiHandler.PostAPIHandler.UpdatePost)
+		post.DELETE("/delete/:id", apiHandler.PostAPIHandler.DeletePost)
 	}
 
 	return r

@@ -56,7 +56,7 @@ func (r *parentRepository) GetByID(id int) (*model.Parent, error) {
 
 // Update parent data by ID
 func (r *parentRepository) Update(id int, parent *model.Parent) error {
-		if err := r.db.Model(&model.Parent{}).
+	if err := r.db.Model(&model.Parent{}).
 		Where("id = ?", id).
 		Updates(parent).
 		Error; err != nil {

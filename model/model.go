@@ -206,3 +206,26 @@ type Student struct {
 	ParentId *int    `gorm:"unique" json:"parent_id"`
 	Parent   *Parent `json:"parent"`
 }
+
+// POST (BERITA / ARTIKEL / INFORMASI)
+type PostCategory string
+
+const (
+	Berita     PostCategory = "BERITA"
+	Artikel    PostCategory = "ARTIKEL"
+	Informasi  PostCategory = "INFORMASI"
+)
+
+type Post struct {
+	ID          int           `gorm:"primaryKey" json:"id"`
+	Title       string        `json:"title"`
+	Slug        string        `gorm:"unique" json:"slug"`
+	Image       *string       `json:"image"`
+	Content     string        `json:"content"`
+	Excerpt     *string       `json:"excerpt"`
+	Published   bool          `json:"published"`
+	PublishedAt *time.Time    `json:"published_at"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
+	Category    *PostCategory `json:"category"`
+}
