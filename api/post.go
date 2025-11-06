@@ -5,9 +5,21 @@ import (
 	"project_sdu/model"
 	"project_sdu/service"
 	"strconv"
+	"strings"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
+
+func slugify(input string) string {
+	input = strings.ToLower(strings.TrimSpace(input))
+	re := regexp.MustCompile(`[^a-z0-9\s-]`)
+	input = re.ReplaceAllString(input, "")
+	re = regexp.MustCompile(`[\s\-_]+`)
+	input = re.ReplaceAllString(input, "-")
+	input = strings.Trim(input, "-")
+	return input
+}
 
 type PostAPI interface {
 	CreatePost(c *gin.Context)
@@ -50,6 +62,14 @@ func (p *postAPI) CreatePost(c *gin.Context) {
 	if post.Content == "" {
 		errors["content"] = "content is required"
 	}
+
+	// Always (re-)generate slug from Title.
+	if post.Title != "" {
+		post.Slug = slugify(post.Title)
+	} else {
+		post.Slug = ""
+	}
+
 	if post.Slug == "" {
 		errors["slug"] = "slug is required"
 	}
@@ -154,12 +174,13 @@ func (p *postAPI) GetPostBySlug(c *gin.Context) {
 // ====================
 func (p *postAPI) GetAllPosts(c *gin.Context) {
 	limitParam := c.DefaultQuery("limit", "10")
-	offsetParam := c.DefaultQuery("offset", "0")
+	pageParam := c.DefaultQuery("page", "1")
+	q := c.Query("q")
 
 	limit, _ := strconv.Atoi(limitParam)
-	offset, _ := strconv.Atoi(offsetParam)
+	page, _ := strconv.Atoi(pageParam)
 
-	posts, err := p.postService.GetAllPosts(limit, offset)
+	posts, err := p.postService.GetAllPosts(limit, page, q)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
@@ -175,6 +196,10 @@ func (p *postAPI) GetAllPosts(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Posts retrieved successfully",
 		Data:    posts,
+		Meta: gin.H{
+			"page":  page,
+			"limit": limit,
+		},
 	})
 }
 
@@ -231,6 +256,11 @@ func (p *postAPI) UpdatePost(c *gin.Context) {
 			Errors:  map[string]string{"body": err.Error()},
 		})
 		return
+	}
+
+	// Re-generate slug from Title when updating, if Title is present and non-empty.
+	if post.Title != "" {
+		post.Slug = slugify(post.Title)
 	}
 
 	if err := p.postService.UpdatePost(id, &post); err != nil {

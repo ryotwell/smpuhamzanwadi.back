@@ -142,7 +142,7 @@ func (u *userAPI) Login(c *gin.Context) {
 		return
 	}
 
-	token, userID, err := u.userService.Login(req)
+	token, user, err := u.userService.Login(req)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, model.ErrorResponse{
 			Success: false,
@@ -163,9 +163,9 @@ func (u *userAPI) Login(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Login successful",
 		Data: gin.H{
-			"user_id": userID,
-			"email":   req.Email,
-			"token":   token,
+			"user_id":	user.ID,
+			"email":    user.Email,
+			"fullname": user.Fullname,
 		},
 	})
 }
@@ -237,8 +237,9 @@ func (u *userAPI) GetUserProfile(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Retrived user profile succesfully",
 		Data: gin.H{
-			"user_id": claims.UserID,
-			"email":   user.Email,
+			"user_id":  claims.UserID,
+			"email":    user.Email,
+			"fullname": user.Fullname,
 		},
 	})
 

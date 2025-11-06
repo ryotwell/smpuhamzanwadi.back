@@ -220,7 +220,7 @@ type Post struct {
 	ID          int           `gorm:"primaryKey" json:"id"`
 	Title       string        `json:"title"`
 	Slug        string        `gorm:"unique" json:"slug"`
-	Image       *string       `json:"image"`
+	Thumbnail   *string       `json:"thumbnail"`
 	Content     string        `json:"content"`
 	Excerpt     *string       `json:"excerpt"`
 	Published   bool          `json:"published"`
