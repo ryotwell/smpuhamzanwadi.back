@@ -59,33 +59,6 @@ func main() {
 	}))
 	// --- END CORS ---
 
-	// // Koneksi ke DB Postgres
-	// dbCredential := model.Credential{
-	// 	Host:         "localhost",
-	// 	Username:     "postgres",
-	// 	Password:     "farid123",
-	// 	DatabaseName: "tes_sdu",
-	// 	Port:         5432,
-	// 	Schema:       "public",
-	// }
-
-	// database := db.NewDB()
-	// conn, err := database.Connect(&dbCredential)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// // Migrasi tabel
-	// conn.AutoMigrate(&model.User{}, &model.Student{})
-
-	// // Route
-	// router = RunServer(router, conn)
-
-	// fmt.Println("Server is running on port 8080")
-	// if err := router.Run(":8080"); err != nil {
-	// 	panic(err)
-	// }
-
 	// Get DATABASE_URL
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
