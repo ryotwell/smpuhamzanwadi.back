@@ -135,12 +135,12 @@ func (s *studentAPI) GetStudentByID(c *gin.Context) {
 // ====================
 func (s *studentAPI) GetAllStudents(c *gin.Context) {
 	limitParam := c.DefaultQuery("limit", "10")
-	offsetParam := c.DefaultQuery("offset", "0")
+	pageParam := c.DefaultQuery("page", "1")
 
 	limit, _ := strconv.Atoi(limitParam)
-	offset, _ := strconv.Atoi(offsetParam)
+	page, _ := strconv.Atoi(pageParam)
 
-	students, err := s.studentService.GetAllStudents(limit, offset)
+	students, err := s.studentService.GetAllStudents(limit, page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,

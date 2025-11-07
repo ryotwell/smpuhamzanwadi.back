@@ -53,8 +53,8 @@ func (s *studentService) GetStudentByID(id int) (*model.Student, error) {
 	return student, nil
 }
 
-func (s *studentService) GetAllStudents(limit int, offset int) ([]model.Student, error) {
-	students, err := s.studentRepo.GetAll(limit, offset)
+func (s *studentService) GetAllStudents(limit int, page int) ([]model.Student, error) {
+	students, err := s.studentRepo.GetAll(limit, page)
 	if err != nil {
 		return nil, err
 	}

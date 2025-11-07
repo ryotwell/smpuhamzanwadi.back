@@ -61,8 +61,10 @@ func (r *studentRepository) GetByID(id int) (*model.Student, error) {
 
 
 // Get all students with pagination support and sort the names in alphabetical order
-func (r *studentRepository) GetAll(limit int, offset int) ([]model.Student, error) {
+func (r *studentRepository) GetAll(limit int, page int) ([]model.Student, error) {
 	var students []model.Student
+
+	offset := (page - 1) * limit
 
 	err := r.db.
 		Preload("Parent").
