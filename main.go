@@ -183,10 +183,11 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	// Post routes
 	post := r.Group("/post")
 	{
+		post.GET("/get/:slug", apiHandler.PostAPIHandler.GetPostBySlug)
+		post.GET("/get-all", apiHandler.PostAPIHandler.GetAllPosts)
+
 		post.Use(middleware.Auth())
 		post.POST("/add", apiHandler.PostAPIHandler.CreatePost)
-		post.GET("/get-all", apiHandler.PostAPIHandler.GetAllPosts)
-		post.GET("/get/:id", apiHandler.PostAPIHandler.GetPostByID)
 		post.PUT("/update/:id", apiHandler.PostAPIHandler.UpdatePost)
 		post.DELETE("/delete/:id", apiHandler.PostAPIHandler.DeletePost)
 	}
