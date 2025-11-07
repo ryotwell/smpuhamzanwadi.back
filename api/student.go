@@ -156,6 +156,10 @@ func (s *studentAPI) GetAllStudents(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Students retrieved successfully",
 		Data:    students,
+		Meta: gin.H{
+			"limit": limit,
+			"page":  page,
+		},
 	})
 }
 
