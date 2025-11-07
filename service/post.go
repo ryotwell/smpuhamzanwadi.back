@@ -7,7 +7,7 @@ import (
 
 type PostService interface {
 	CreatePost(post *model.Post) error
-	GetAllPosts(limit int, offset int) ([]model.Post, error)
+	GetAllPosts(limit int, page int, q string) ([]model.Post, error)
 	GetPublishedPosts(limit int, offset int) ([]model.Post, error)
 	GetPostByID(id int) (*model.Post, error)
 	GetPostBySlug(slug string) (*model.Post, error)
@@ -30,8 +30,8 @@ func (s *postService) CreatePost(post *model.Post) error {
 	return nil
 }
 
-func (s *postService) GetAllPosts(limit int, offset int) ([]model.Post, error) {
-	posts, err := s.postRepo.GetAll(limit, offset)
+func (s *postService) GetAllPosts(limit int, page int, q string) ([]model.Post, error) {
+	posts, err := s.postRepo.GetAll(limit, page, q)
 	if err != nil {
 		return nil, err
 	}

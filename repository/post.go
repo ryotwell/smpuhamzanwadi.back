@@ -12,7 +12,7 @@ type PostRepository interface {
 	Delete(id int) error
 	GetByID(id int) (*model.Post, error)
 	GetBySlug(slug string) (*model.Post, error)
-	GetAll(limit, offset int) ([]model.Post, error)
+	GetAll(limit, page int, q string) ([]model.Post, error)
 	GetPublished(limit, offset int) ([]model.Post, error)
 }
 
@@ -60,9 +60,16 @@ func (r *postRepository) GetBySlug(slug string) (*model.Post, error) {
 	return &post, nil
 }
 
-func (r *postRepository) GetAll(limit, offset int) ([]model.Post, error) {
+func (r *postRepository) GetAll(limit, page int, q string) ([]model.Post, error) {
 	var posts []model.Post
-	err := r.db.
+	db := r.db
+	offset := (page - 1) * limit
+
+	if q != "" {
+		db = db.Where("title ILIKE ? OR content ILIKE ?", "%"+q+"%", "%"+q+"%")
+	}
+
+	err := db.
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).

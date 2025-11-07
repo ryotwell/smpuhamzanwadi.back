@@ -11,7 +11,7 @@ import (
 )
 
 type UserService interface {
-	Login(user model.User) (token *string, userID int, err error)
+	Login(user model.User) (token *string, usr model.User, err error)
 	Register(user model.User) error
 	GetUserByID(id int) (model.User, error)
 
@@ -28,14 +28,14 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 	return &userService{userRepository}
 }
 
-func (s *userService) Login(user model.User) (token *string, userID int, err error) {
+func (s *userService) Login(user model.User) (token *string, usr model.User, err error) {
 	dbUser, err := s.userRepository.CheckAvail(user)
 	if err != nil {
-		return nil, 0, errors.New("user not found")
+		return nil, model.User{}, errors.New("user not found")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)); err != nil {
-		return nil, 0, errors.New("wrong email or password")
+		return nil, model.User{}, errors.New("wrong email or password")
 	}
 
 	// if dbUser.Email != user.Email || dbUser.Password != user.Password {
@@ -53,10 +53,10 @@ func (s *userService) Login(user model.User) (token *string, userID int, err err
 	tokenJwt := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenJwtString, err := tokenJwt.SignedString(model.JwtKey)
 	if err != nil {
-		return nil, 0, err
+		return nil, model.User{}, err
 	}
 
-	return &tokenJwtString, dbUser.ID, nil
+	return &tokenJwtString, dbUser, nil
 }
 
 func (s *userService) Register(user model.User) error {
