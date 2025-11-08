@@ -23,11 +23,12 @@ import (
 )
 
 type APIHandler struct {
-	UserAPIHandler    api.UserAPI
-	StudentAPIHandler api.StudentAPI
-	ParentAPIHandler  api.ParentAPI
-	PostAPIHandler    api.PostAPI
-	ExtraAPIHandler   api.ExtracurricularAPI
+	UserAPIHandler     api.UserAPI
+	StudentAPIHandler  api.StudentAPI
+	ParentAPIHandler   api.ParentAPI
+	PostAPIHandler     api.PostAPI
+	ExtraAPIHandler    api.ExtracurricularAPI
+	FacilityAPIHandler api.FacilityAPI
 }
 
 func main() {
@@ -74,7 +75,9 @@ func main() {
 	}
 
 	// Migration
-	conn.AutoMigrate(&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Extracurricular{})
+	conn.AutoMigrate(
+		&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Extracurricular{}, &model.Facility{},
+	)
 
 	// Route
 	router = RunServer(router, conn)
@@ -100,25 +103,29 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	parentRepo := repo.NewParentRepo(dbConn)
 	postRepo := repo.NewPostRepo(dbConn)
 	extraRepo := repo.NewExtracurricularRepository(dbConn)
+	facilityRepo := repo.NewFacilityRepository(dbConn)
 
 	userService := service.NewUserService(userRepo)
 	studentService := service.NewStudentService(studentRepo, parentRepo)
 	parentService := service.NewParentService(parentRepo)
 	postService := service.NewPostService(postRepo)
 	extraService := service.NewExtracurricularService(extraRepo)
+	facilityService := service.NewfacilityService(facilityRepo)
 
 	userAPIHandler := api.NewUserAPI(userService)
 	studentAPIHandler := api.NewStudentAPI(studentService)
 	parentAPIHandler := api.NewParentAPI(parentService)
 	postAPIHandler := api.NewPostAPI(postService)
 	extraAPIHandler := api.NewExtracurricularAPI(extraService)
+	facilityAPIHandler := api.NewFacilityAPI(facilityService)
 
 	apiHandler := APIHandler{
-		UserAPIHandler:    userAPIHandler,
-		StudentAPIHandler: studentAPIHandler,
-		ParentAPIHandler:  parentAPIHandler,
-		PostAPIHandler:    postAPIHandler,
-		ExtraAPIHandler:   extraAPIHandler,
+		UserAPIHandler:     userAPIHandler,
+		StudentAPIHandler:  studentAPIHandler,
+		ParentAPIHandler:   parentAPIHandler,
+		PostAPIHandler:     postAPIHandler,
+		ExtraAPIHandler:    extraAPIHandler,
+		FacilityAPIHandler: facilityAPIHandler,
 	}
 
 	// ROUTES //
@@ -170,6 +177,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		post.DELETE("/delete/:id", apiHandler.PostAPIHandler.DeletePost)
 	}
 
+	// Extracurricular routes
 	extracurricular := r.Group("/extracurricular")
 	{
 		extracurricular.Use(middleware.Auth())
@@ -180,5 +188,15 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		extracurricular.DELETE("/delete/:id", apiHandler.ExtraAPIHandler.Delete)
 	}
 
+	// Facility routes
+	facility := r.Group("/facility")
+	{
+		facility.Use(middleware.Auth())
+		facility.POST("/add", apiHandler.FacilityAPIHandler.CreateFacility)
+		facility.GET("/get-all", apiHandler.FacilityAPIHandler.GetAllFacilities)
+		facility.GET("/get/:id", apiHandler.FacilityAPIHandler.GetFacilityByID)
+		facility.PUT("/update/:id", apiHandler.FacilityAPIHandler.UpdateFacility)
+		facility.DELETE("/delete/:id", apiHandler.FacilityAPIHandler.DeleteFacility)
+	}
 	return r
 }
