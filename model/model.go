@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// ======================
+// USER
+// ======================
+
 type User struct {
 	ID        int       `gorm:"primaryKey" json:"id"`
 	Fullname  string    `json:"fullname" gorm:"type:varchar(255);"`
@@ -68,6 +72,10 @@ type Credential struct {
 // 	Message  string `json:"message"`
 // }
 
+// ======================
+// RESPONSE
+// ======================
+
 type SuccessResponse struct {
 	Success bool        `json:"success"`
 	Status  int         `json:"status"`
@@ -83,7 +91,10 @@ type ErrorResponse struct {
 	Errors  map[string]string `json:"errors,omitempty"`
 }
 
-// Parent Model
+// ======================
+// PARENT
+// ======================
+
 type Parent struct {
 	ID        int       `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -108,7 +119,10 @@ type Parent struct {
 	Student *Student `json:"student"`
 }
 
-// Student Model
+// ======================
+// STUDENT
+// ======================
+
 type Gender string
 
 const (
@@ -207,7 +221,11 @@ type Student struct {
 	Parent   *Parent `json:"parent"`
 }
 
+
+// ======================
 // POST (BERITA / ARTIKEL / INFORMASI)
+// ======================
+
 type PostCategory string
 
 const (
@@ -228,4 +246,31 @@ type Post struct {
 	CreatedAt   time.Time     `json:"created_at"`
 	UpdatedAt   time.Time     `json:"updated_at"`
 	Category    *PostCategory `json:"category"`
+}
+
+
+// ======================
+// SCHOOL FACILITY
+// ======================
+
+type Facility struct {
+	ID          int            `gorm:"primaryKey" json:"id"`
+	Name        string         `json:"name"`
+	Image       *string        `json:"image"`
+	Description *string        `json:"description"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+}
+
+// ======================
+// EXTRACURRICULAR
+// ======================
+
+type Extracurricular struct {
+	ID          int        `gorm:"primaryKey" json:"id"`
+	Name        string     `json:"name"`
+	Image       *string    `json:"image"`
+	Description *string    `json:"description"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }

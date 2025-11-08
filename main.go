@@ -27,6 +27,7 @@ type APIHandler struct {
 	StudentAPIHandler api.StudentAPI
 	ParentAPIHandler  api.ParentAPI
 	PostAPIHandler    api.PostAPI
+	ExtraAPIHandler   api.ExtracurricularAPI
 }
 
 func main() {
@@ -73,7 +74,7 @@ func main() {
 	}
 
 	// Migration
-	conn.AutoMigrate(&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{})
+	conn.AutoMigrate(&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Extracurricular{})
 
 	// Route
 	router = RunServer(router, conn)
@@ -98,22 +99,26 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	studentRepo := repo.NewStudentRepo(dbConn)
 	parentRepo := repo.NewParentRepo(dbConn)
 	postRepo := repo.NewPostRepo(dbConn)
+	extraRepo := repo.NewExtracurricularRepository(dbConn)
 
 	userService := service.NewUserService(userRepo)
 	studentService := service.NewStudentService(studentRepo, parentRepo)
 	parentService := service.NewParentService(parentRepo)
 	postService := service.NewPostService(postRepo)
+	extraService := service.NewExtracurricularService(extraRepo)
 
 	userAPIHandler := api.NewUserAPI(userService)
 	studentAPIHandler := api.NewStudentAPI(studentService)
 	parentAPIHandler := api.NewParentAPI(parentService)
 	postAPIHandler := api.NewPostAPI(postService)
+	extraAPIHandler := api.NewExtracurricularAPI(extraService)
 
 	apiHandler := APIHandler{
 		UserAPIHandler:    userAPIHandler,
 		StudentAPIHandler: studentAPIHandler,
 		ParentAPIHandler:  parentAPIHandler,
 		PostAPIHandler:    postAPIHandler,
+		ExtraAPIHandler:   extraAPIHandler,
 	}
 
 	// ROUTES //
@@ -163,6 +168,16 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		post.POST("/add", apiHandler.PostAPIHandler.CreatePost)
 		post.PUT("/update/:id", apiHandler.PostAPIHandler.UpdatePost)
 		post.DELETE("/delete/:id", apiHandler.PostAPIHandler.DeletePost)
+	}
+
+	extracurricular := r.Group("/extracurricular")
+	{
+		extracurricular.Use(middleware.Auth())
+		extracurricular.POST("/add", apiHandler.ExtraAPIHandler.Create)
+		extracurricular.GET("/get-all", apiHandler.ExtraAPIHandler.GetAll)
+		extracurricular.GET("/get/:id", apiHandler.ExtraAPIHandler.GetByID)
+		extracurricular.PUT("/update/:id", apiHandler.ExtraAPIHandler.Update)
+		extracurricular.DELETE("/delete/:id", apiHandler.ExtraAPIHandler.Delete)
 	}
 
 	return r
