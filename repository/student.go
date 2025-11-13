@@ -59,7 +59,6 @@ func (r *studentRepository) GetByID(id int) (*model.Student, error) {
 // 	return students, nil
 // }
 
-
 // Get all students with pagination support and sort the names in alphabetical order
 func (r *studentRepository) GetAll(limit int, page int) ([]model.Student, error) {
 	var students []model.Student
@@ -81,13 +80,21 @@ func (r *studentRepository) GetAll(limit int, page int) ([]model.Student, error)
 	return students, nil
 }
 
-// Update student data by ID
+// Update student and parent data by student ID
 func (r *studentRepository) Update(id int, student *model.Student) error {
-	if err := r.db.Model(&model.Student{}).
-		Where("id = ?", id).
-		Updates(student).
-		Error; err != nil {
+	var existingStudent model.Student
+	if err := r.db.Preload("Parent").First(&existingStudent, id).Error; err != nil {
 		return err
+	}
+
+	if err := r.db.Model(&existingStudent).Updates(student).Error; err != nil {
+		return err
+	}
+
+	if student.Parent != nil {
+		if err := r.db.Model(&existingStudent.Parent).Updates(student.Parent).Error; err != nil {
+			return err
+		}
 	}
 
 	return nil
