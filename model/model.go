@@ -204,13 +204,17 @@ type Student struct {
 	AlamatJalan           *string         `json:"alamat_jalan"`
 	Rt                    *string         `json:"rt"`
 	Rw                    *string         `json:"rw"`
-	DesaKel               *string         `json:"desa_kel"`
+	DesaKelurahan         *string         `json:"desa_kelurahan"`
 	Kecamatan             *string         `json:"kecamatan"`
 	Kabupaten             *string         `json:"kabupaten"`
 	Provinsi              *string         `json:"provinsi"`
 	KodePos               *string         `json:"kode_pos"`
 	Phone                 *string         `json:"phone"`
 	Email                 *string         `json:"email"`
+	Photo                 *string         `json:"photo"`
+	KartuKeluarga         *string         `json:"kartu_keluarga"`
+	AktaKelahiran         *string         `json:"akta_kelahiran"`
+	IjazahSKL             *string         `json:"ijazah_skl"`
 
 	BloodType       *BloodType `json:"blood_type"`
 	BeratKg         *int       `json:"berat_kg"`
