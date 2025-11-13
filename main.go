@@ -180,10 +180,11 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	// Extracurricular routes
 	extracurricular := r.Group("/extracurricular")
 	{
-		extracurricular.Use(middleware.Auth())
-		extracurricular.POST("/add", apiHandler.ExtraAPIHandler.Create)
 		extracurricular.GET("/get-all", apiHandler.ExtraAPIHandler.GetAll)
 		extracurricular.GET("/get/:id", apiHandler.ExtraAPIHandler.GetByID)
+		
+		extracurricular.Use(middleware.Auth())
+		extracurricular.POST("/add", apiHandler.ExtraAPIHandler.Create)
 		extracurricular.PUT("/update/:id", apiHandler.ExtraAPIHandler.Update)
 		extracurricular.DELETE("/delete/:id", apiHandler.ExtraAPIHandler.Delete)
 	}
@@ -191,10 +192,11 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	// Facility routes
 	facility := r.Group("/facility")
 	{
-		facility.Use(middleware.Auth())
-		facility.POST("/add", apiHandler.FacilityAPIHandler.CreateFacility)
 		facility.GET("/get-all", apiHandler.FacilityAPIHandler.GetAllFacilities)
 		facility.GET("/get/:id", apiHandler.FacilityAPIHandler.GetFacilityByID)
+
+		facility.Use(middleware.Auth())
+		facility.POST("/add", apiHandler.FacilityAPIHandler.CreateFacility)
 		facility.PUT("/update/:id", apiHandler.FacilityAPIHandler.UpdateFacility)
 		facility.DELETE("/delete/:id", apiHandler.FacilityAPIHandler.DeleteFacility)
 	}
