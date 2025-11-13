@@ -182,7 +182,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	{
 		extracurricular.GET("/get-all", apiHandler.ExtraAPIHandler.GetAll)
 		extracurricular.GET("/get/:id", apiHandler.ExtraAPIHandler.GetByID)
-		
+
 		extracurricular.Use(middleware.Auth())
 		extracurricular.POST("/add", apiHandler.ExtraAPIHandler.Create)
 		extracurricular.PUT("/update/:id", apiHandler.ExtraAPIHandler.Update)
