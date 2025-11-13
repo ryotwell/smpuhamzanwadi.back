@@ -141,6 +141,12 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		user.GET("/profile", apiHandler.UserAPIHandler.GetUserProfile)
 	}
 
+	// PPDB routes
+	ppdb := r.Group("/ppdb")
+	{
+		ppdb.POST("/add", apiHandler.StudentAPIHandler.CreateStudent)
+	}
+
 	// Student routes
 	student := r.Group("/student")
 	{
