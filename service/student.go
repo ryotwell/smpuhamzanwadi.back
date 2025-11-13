@@ -28,17 +28,22 @@ func NewStudentService(studentRepo repository.StudentRepository, parentRepo repo
 
 // CreateStudent menyimpan student beserta parent-nya jika ada
 func (s *studentService) CreateStudent(student *model.Student) error {
+	var parentCreated bool
+
 	// Simpan parent jika ada
 	if student.Parent != nil {
 		if err := s.parentRepo.Create(student.Parent); err != nil {
 			return errors.New("failed to create parent: " + err.Error())
 		}
-		// Set ParentID di student setelah parent tersimpan
+		parentCreated = true
 		student.ParentId = &student.Parent.ID
 	}
-
-	// Simpan student
+	
 	if err := s.studentRepo.Create(student); err != nil {
+		// Jika gagal menyimpan student, hapus parent yang sudah dibuat
+		if parentCreated && student.Parent != nil {
+			_ = s.parentRepo.Delete(student.Parent.ID)
+		}
 		return errors.New("failed to create student: " + err.Error())
 	}
 

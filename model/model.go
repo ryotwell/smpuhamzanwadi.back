@@ -187,7 +187,7 @@ type Student struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	FullName              string          `json:"full_name"`
-	Nisn                  *string         `gorm:"unique" json:"nisn"`
+	Nisn                  *string         `gorm:"uniqueIndex" json:"nisn"`
 	Nik                   *string         `gorm:"uniqueIndex" json:"nik"`
 	AsalSekolah           *string         `json:"asal_sekolah"`
 	Gender                Gender          `json:"gender"`
