@@ -221,7 +221,6 @@ type Student struct {
 	Parent   *Parent `json:"parent"`
 }
 
-
 // ======================
 // POST (BERITA / ARTIKEL / INFORMASI)
 // ======================
@@ -229,9 +228,9 @@ type Student struct {
 type PostCategory string
 
 const (
-	Berita     PostCategory = "BERITA"
-	Artikel    PostCategory = "ARTIKEL"
-	Informasi  PostCategory = "INFORMASI"
+	Berita    PostCategory = "BERITA"
+	Artikel   PostCategory = "ARTIKEL"
+	Informasi PostCategory = "INFORMASI"
 )
 
 type Post struct {
@@ -239,6 +238,7 @@ type Post struct {
 	Title       string        `json:"title"`
 	Slug        string        `gorm:"unique" json:"slug"`
 	Thumbnail   *string       `json:"thumbnail"`
+	Description *string       `json:"description"`
 	Content     string        `json:"content"`
 	Excerpt     *string       `json:"excerpt"`
 	Published   bool          `json:"published"`
@@ -248,18 +248,17 @@ type Post struct {
 	Category    *PostCategory `json:"category"`
 }
 
-
 // ======================
 // SCHOOL FACILITY
 // ======================
 
 type Facility struct {
-	ID          int            `gorm:"primaryKey" json:"id"`
-	Name        string         `json:"name"`
-	Image       *string        `json:"image"`
-	Description *string        `json:"description"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
+	ID          int       `gorm:"primaryKey" json:"id"`
+	Name        string    `json:"name"`
+	Image       *string   `json:"image"`
+	Description *string   `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // ======================
@@ -267,10 +266,10 @@ type Facility struct {
 // ======================
 
 type Extracurricular struct {
-	ID          int        `gorm:"primaryKey" json:"id"`
-	Name        string     `json:"name"`
-	Image       *string    `json:"image"`
-	Description *string    `json:"description"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ID          int       `gorm:"primaryKey" json:"id"`
+	Name        string    `json:"name"`
+	Image       *string   `json:"image"`
+	Description *string   `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
