@@ -11,8 +11,8 @@ type PostService interface {
 	GetPublishedPosts(limit int, offset int) ([]model.Post, error)
 	GetPostByID(id int) (*model.Post, error)
 	GetPostBySlug(slug string) (*model.Post, error)
-	UpdatePost(id int, post *model.Post) error
-	DeletePost(id int) error
+	UpdatePost(slug string, post *model.Post) error
+	DeletePost(slug string) error
 }
 
 type postService struct {
@@ -62,20 +62,20 @@ func (s *postService) GetPostBySlug(slug string) (*model.Post, error) {
 	return post, nil
 }
 
-func (s *postService) UpdatePost(id int, post *model.Post) error {
-	_, err := s.postRepo.GetByID(id)
+func (s *postService) UpdatePost(slug string, post *model.Post) error {
+	_, err := s.postRepo.GetBySlug(slug)
 	if err != nil {
 		return err
 	}
 
-	return s.postRepo.Update(id, post)
+	return s.postRepo.Update(slug, post)
 }
 
-func (s *postService) DeletePost(id int) error {
-	_, err := s.postRepo.GetByID(id)
+func (s *postService) DeletePost(slug string) error {
+	_, err := s.postRepo.GetBySlug(slug)
 	if err != nil {
 		return err
 	}
 
-	return s.postRepo.Delete(id)
+	return s.postRepo.Delete(slug)
 }

@@ -8,8 +8,8 @@ import (
 
 type PostRepository interface {
 	Create(post *model.Post) error
-	Update(id int, post *model.Post) error
-	Delete(id int) error
+	Update(slug string, post *model.Post) error
+	Delete(slug string) error
 	GetByID(id int) (*model.Post, error)
 	GetBySlug(slug string) (*model.Post, error)
 	GetAll(limit, page int, q string) ([]model.Post, error)
@@ -28,18 +28,18 @@ func (r *postRepository) Create(post *model.Post) error {
 	return r.db.Create(post).Error
 }
 
-func (r *postRepository) Update(id int, post *model.Post) error {
-	if err := r.db.Model(&model.Post{}).
-		Where("id = ?", id).
+func (r *postRepository) Update(slug string, post *model.Post) error {
+	return r.db.Model(&model.Post{}).
+		Where("slug = ?", slug). // gunakan slug
 		Updates(post).
-		Error; err != nil {
-		return err
-	}
-	return nil
+		Error
 }
 
-func (r *postRepository) Delete(id int) error {
-	return r.db.Delete(&model.Post{}, id).Error
+func (r *postRepository) Delete(slug string) error {
+	return r.db.
+		Where("slug = ?", slug). // nanti akan diganti pada service
+		Delete(&model.Post{}).
+		Error
 }
 
 func (r *postRepository) GetByID(id int) (*model.Post, error) {

@@ -236,13 +236,23 @@ func (p *postAPI) GetPublishedPosts(c *gin.Context) {
 // UPDATE POST
 // ====================
 func (p *postAPI) UpdatePost(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
+	// idParam := c.Param("id")
+	// id, err := strconv.Atoi(idParam)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, model.ErrorResponse{
+	// 		Success: false,
+	// 		Status:  http.StatusBadRequest,
+	// 		Message: "Invalid post ID",
+	// 	})
+	// 	return
+	// }
+
+	slug := c.Param("slug")
+	if slug == "" {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusBadRequest,
-			Message: "Invalid post ID",
+			Message: "Slug is required",
 		})
 		return
 	}
@@ -258,12 +268,7 @@ func (p *postAPI) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	// Re-generate slug from Title when updating, if Title is present and non-empty.
-	if post.Title != "" {
-		post.Slug = slugify(post.Title)
-	}
-
-	if err := p.postService.UpdatePost(id, &post); err != nil {
+	if err := p.postService.UpdatePost(slug, &post); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
@@ -285,18 +290,27 @@ func (p *postAPI) UpdatePost(c *gin.Context) {
 // DELETE POST
 // ====================
 func (p *postAPI) DeletePost(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
+	// idParam := c.Param("id")
+	// id, err := strconv.Atoi(idParam)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, model.ErrorResponse{
+	// 		Success: false,
+	// 		Status:  http.StatusBadRequest,
+	// 		Message: "Invalid post ID",
+	// 	})
+	// 	return
+	// }
+	slug := c.Param("slug")
+	if slug == "" {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusBadRequest,
-			Message: "Invalid post ID",
+			Message: "Slug is required",
 		})
 		return
 	}
 
-	if err := p.postService.DeletePost(id); err != nil {
+	if err := p.postService.DeletePost(slug); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,

@@ -179,8 +179,8 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 
 		post.Use(middleware.Auth())
 		post.POST("/add", apiHandler.PostAPIHandler.CreatePost)
-		post.PUT("/update/:id", apiHandler.PostAPIHandler.UpdatePost)
-		post.DELETE("/delete/:id", apiHandler.PostAPIHandler.DeletePost)
+		post.PUT("/update/:slug", apiHandler.PostAPIHandler.UpdatePost)
+		post.DELETE("/delete/:slug", apiHandler.PostAPIHandler.DeletePost)
 	}
 
 	// Extracurricular routes
