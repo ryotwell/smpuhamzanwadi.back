@@ -30,14 +30,14 @@ func (r *postRepository) Create(post *model.Post) error {
 
 func (r *postRepository) Update(slug string, post *model.Post) error {
 	return r.db.Model(&model.Post{}).
-		Where("slug = ?", slug). // gunakan slug
+		Where("slug = ?", slug).
 		Updates(post).
 		Error
 }
 
 func (r *postRepository) Delete(slug string) error {
 	return r.db.
-		Where("slug = ?", slug). // nanti akan diganti pada service
+		Where("slug = ?", slug).
 		Delete(&model.Post{}).
 		Error
 }
