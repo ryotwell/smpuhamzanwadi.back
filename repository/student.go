@@ -33,7 +33,6 @@ func NewStudentRepo(db *gorm.DB) StudentRepository {
 func (r *studentRepository) Create(student *model.Student) error {
 	err := r.db.Create(student).Error
 	if err != nil {
-		// Deteksi error unique dari Postgres
 		if strings.Contains(err.Error(), "idx_students_nik") {
 			return ErrNIKExists
 		}
