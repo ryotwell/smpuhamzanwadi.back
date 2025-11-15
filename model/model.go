@@ -178,7 +178,6 @@ const (
 	Hindu     Religion = "HINDU"
 	Buddha    Religion = "BUDDHA"
 	Konghucu  Religion = "KONGHUCU"
-	OtherRel  Religion = "OTHER"
 )
 
 type Student struct {

@@ -52,6 +52,9 @@ func (s *studentAPI) CreateStudent(c *gin.Context) {
 	if student.Gender == "" {
 		errors["gender"] = "Gender is required"
 	}
+	if *student.Agama == "" {
+		errors["agama"] = "Agama is required"
+	}
 	if len(errors) > 0 {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
