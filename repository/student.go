@@ -42,22 +42,6 @@ func (r *studentRepository) Create(student *model.Student) error {
 		return err
 	}
 	return nil
-	// if err != nil {
-	// 	// Tangkap error PostgreSQL
-	// 	var pqErr *pq.Error
-	// 	if errors.As(err, &pqErr) {
-	// 		if pqErr.Code == "23505" { // unique_violation
-	// 			if pqErr.Constraint == "idx_students_nik" {
-	// 				return errors.New("NIK sudah terdaftar")
-	// 			}
-	// 			if pqErr.Constraint == "idx_students_nisn" {
-	// 				return errors.New("NISN sudah terdaftar")
-	// 			}
-	// 		}
-	// 	}
-	// 	return err
-	// }
-	// return nil
 }
 
 // Get single student by ID with Parent relation
