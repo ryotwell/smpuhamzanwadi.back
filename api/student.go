@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"project_sdu/model"
+	"project_sdu/repository"
 	"project_sdu/service"
 	"strconv"
 
@@ -62,6 +63,26 @@ func (s *studentAPI) CreateStudent(c *gin.Context) {
 	}
 
 	if err := s.studentService.CreateStudent(&student); err != nil {
+		switch err {
+		case repository.ErrNIKExists:
+			c.JSON(http.StatusBadRequest, model.ErrorResponse{
+				Success: false,
+				Status:  http.StatusBadRequest,
+				Message: "Validation failed",
+				Errors:  map[string]string{"nik": repository.ErrNIKExists.Error()},
+			})
+			return
+
+		case repository.ErrNISNExists:
+			c.JSON(http.StatusBadRequest, model.ErrorResponse{
+				Success: false,
+				Status:  http.StatusBadRequest,
+				Message: "Validation failed",
+				Errors:  map[string]string{"nisn": repository.ErrNISNExists.Error()},
+			})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,

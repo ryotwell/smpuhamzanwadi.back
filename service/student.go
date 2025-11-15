@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"project_sdu/model"
 	"project_sdu/repository"
 )
@@ -21,8 +20,8 @@ type studentService struct {
 
 func NewStudentService(studentRepo repository.StudentRepository, parentRepo repository.ParentRepository) StudentService {
 	return &studentService{
-		studentRepo : studentRepo,
-		parentRepo : parentRepo,
+		studentRepo: studentRepo,
+		parentRepo:  parentRepo,
 	}
 }
 
@@ -33,18 +32,18 @@ func (s *studentService) CreateStudent(student *model.Student) error {
 	// Simpan parent jika ada
 	if student.Parent != nil {
 		if err := s.parentRepo.Create(student.Parent); err != nil {
-			return errors.New("failed to create parent: " + err.Error())
+			return err
 		}
 		parentCreated = true
 		student.ParentId = &student.Parent.ID
 	}
-	
+
 	if err := s.studentRepo.Create(student); err != nil {
 		// Jika gagal menyimpan student, hapus parent yang sudah dibuat
 		if parentCreated && student.Parent != nil {
 			_ = s.parentRepo.Delete(student.Parent.ID)
 		}
-		return errors.New("failed to create student: " + err.Error())
+		return err
 	}
 
 	return nil
@@ -53,7 +52,7 @@ func (s *studentService) CreateStudent(student *model.Student) error {
 func (s *studentService) GetStudentByID(id int) (*model.Student, error) {
 	student, err := s.studentRepo.GetByID(id)
 	if err != nil {
-		return nil, errors.New("student not found")
+		return nil, err
 	}
 	return student, nil
 }
