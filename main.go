@@ -76,7 +76,7 @@ func main() {
 
 	// Migration
 	conn.AutoMigrate(
-		&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Extracurricular{}, &model.Facility{},
+		&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Extracurricular{}, &model.Facility{}, &model.Batch{},
 	)
 
 	// Route
@@ -104,9 +104,10 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	postRepo := repo.NewPostRepo(dbConn)
 	extraRepo := repo.NewExtracurricularRepository(dbConn)
 	facilityRepo := repo.NewFacilityRepository(dbConn)
+	batchRepo := repo.NewBatchRepository(dbConn)
 
 	userService := service.NewUserService(userRepo)
-	studentService := service.NewStudentService(studentRepo, parentRepo)
+	studentService := service.NewStudentService(studentRepo, parentRepo, batchRepo)
 	parentService := service.NewParentService(parentRepo)
 	postService := service.NewPostService(postRepo)
 	extraService := service.NewExtracurricularService(extraRepo)
@@ -157,6 +158,8 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		student.GET("/get-all", apiHandler.StudentAPIHandler.GetAllStudents)
 		student.PUT("/update/:id", apiHandler.StudentAPIHandler.UpdateStudent)
 		student.DELETE("/delete/:id", apiHandler.StudentAPIHandler.DeleteStudent)
+
+		student.GET("/batch/:year", apiHandler.StudentAPIHandler.GetStudentsByBatchYear)
 
 	}
 

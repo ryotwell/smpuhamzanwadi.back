@@ -222,6 +222,9 @@ type Student struct {
 
 	ParentId *int    `gorm:"unique" json:"parent_id"`
 	Parent   *Parent `json:"parent"`
+
+	BatchId *int   `json:"batch_id"`
+	Batch   *Batch `json:"batch"`
 }
 
 // ======================
@@ -275,4 +278,18 @@ type Extracurricular struct {
 	Description *string   `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// ======================
+// BATCH
+// ======================
+
+type Batch struct {
+	ID        int       `gorm:"primaryKey" json:"id"`
+	Name      string    `json:"name"`
+	Year      int       `json:"year"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+
+	Students []Student `json:"students"`
 }

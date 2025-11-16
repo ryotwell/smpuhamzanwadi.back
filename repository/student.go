@@ -15,8 +15,9 @@ var (
 
 type StudentRepository interface {
 	Create(student *model.Student) error
+	GetStudentsByBatchID(batchID int, limit int, page int, q string) ([]model.Student, error)
 	GetByID(id int) (*model.Student, error)
-	GetAll(limit int, offset int) ([]model.Student, error)
+	GetAll(limit int, page int, q string) ([]model.Student, error)
 	Update(id int, student *model.Student) error
 	Delete(id int) error
 }
@@ -44,6 +45,32 @@ func (r *studentRepository) Create(student *model.Student) error {
 	return nil
 }
 
+func (r *studentRepository) GetStudentsByBatchID(batchID int, limit int, page int, q string) ([]model.Student, error) {
+	var students []model.Student
+
+	offset := (page - 1) * limit
+	db := r.db
+
+	db = db.Where("batch_id = ?", batchID)
+
+	if q != "" {
+		db = db.Where("full_name ILIKE ?", "%"+q+"%")
+	}
+
+	err := db.
+		Preload("Parent").
+		Order("full_name ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&students).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return students, nil
+}
+
 // Get single student by ID with Parent relation
 func (r *studentRepository) GetByID(id int) (*model.Student, error) {
 	var student model.Student
@@ -59,30 +86,19 @@ func (r *studentRepository) GetByID(id int) (*model.Student, error) {
 	return &student, nil
 }
 
-// Get all students with pagination support
-// func (r *studentRepository) GetAll(limit int, offset int) ([]model.Student, error) {
-// 	var students []model.Student
-// 	err := r.db.
-// 		Preload("Parent").
-// 		Limit(limit).
-// 		Offset(offset).
-// 		Find(&students).
-// 		Error
-
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return students, nil
-// }
-
 // Get all students with pagination support and sort the names in alphabetical order
-func (r *studentRepository) GetAll(limit int, page int) ([]model.Student, error) {
+func (r *studentRepository) GetAll(limit int, page int, q string) ([]model.Student, error) {
 	var students []model.Student
 
 	offset := (page - 1) * limit
 
-	err := r.db.
+	db := r.db
+
+	if q != "" {
+		db = db.Where("full_name ILIKE ?", "%"+q+"%")
+	}
+
+	err := db.
 		Preload("Parent").
 		Order("full_name ASC").
 		Limit(limit).
