@@ -198,12 +198,14 @@ func (s *studentAPI) GetStudentsByBatchYear(c *gin.Context) {
 func (s *studentAPI) GetAllStudents(c *gin.Context) {
 	limitParam := c.DefaultQuery("limit", "10")
 	pageParam := c.DefaultQuery("page", "1")
+	batchparam := c.Query("batch")
 	q := c.Query("q")
 
 	limit, _ := strconv.Atoi(limitParam)
 	page, _ := strconv.Atoi(pageParam)
+	batch, _ := strconv.Atoi(batchparam)
 
-	students, err := s.studentService.GetAllStudents(limit, page, q)
+	students, err := s.studentService.GetAllStudents(limit, page, q, &batch)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,

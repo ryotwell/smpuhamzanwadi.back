@@ -29,6 +29,7 @@ type APIHandler struct {
 	PostAPIHandler     api.PostAPI
 	ExtraAPIHandler    api.ExtracurricularAPI
 	FacilityAPIHandler api.FacilityAPI
+	BatchAPIHandler    api.BatchAPI
 }
 
 func main() {
@@ -112,6 +113,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	postService := service.NewPostService(postRepo)
 	extraService := service.NewExtracurricularService(extraRepo)
 	facilityService := service.NewfacilityService(facilityRepo)
+	batchService := service.NewBatchService(batchRepo)
 
 	userAPIHandler := api.NewUserAPI(userService)
 	studentAPIHandler := api.NewStudentAPI(studentService)
@@ -119,6 +121,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	postAPIHandler := api.NewPostAPI(postService)
 	extraAPIHandler := api.NewExtracurricularAPI(extraService)
 	facilityAPIHandler := api.NewFacilityAPI(facilityService)
+	batchAPIHandler := api.NewBatchAPI(batchService)
 
 	apiHandler := APIHandler{
 		UserAPIHandler:     userAPIHandler,
@@ -127,6 +130,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		PostAPIHandler:     postAPIHandler,
 		ExtraAPIHandler:    extraAPIHandler,
 		FacilityAPIHandler: facilityAPIHandler,
+		BatchAPIHandler:    batchAPIHandler,
 	}
 
 	// ROUTES //
@@ -208,6 +212,16 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		facility.POST("/add", apiHandler.FacilityAPIHandler.CreateFacility)
 		facility.PUT("/update/:id", apiHandler.FacilityAPIHandler.UpdateFacility)
 		facility.DELETE("/delete/:id", apiHandler.FacilityAPIHandler.DeleteFacility)
+	}
+
+	batch := r.Group("/batch")
+	{
+		batch.Use(middleware.Auth())
+		batch.GET("/get-all", apiHandler.BatchAPIHandler.GetAll)
+		batch.GET("/get/:id", apiHandler.BatchAPIHandler.GetByID)
+		batch.POST("/add", apiHandler.BatchAPIHandler.Create)
+		batch.PUT("/update/:id", apiHandler.BatchAPIHandler.Update)
+		batch.DELETE("/delete/:id", apiHandler.BatchAPIHandler.Delete)
 	}
 	return r
 }

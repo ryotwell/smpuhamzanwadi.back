@@ -283,13 +283,15 @@ type Extracurricular struct {
 // ======================
 // BATCH
 // ======================
-
 type Batch struct {
-	ID        int       `gorm:"primaryKey" json:"id"`
-	Name      string    `json:"name"`
-	Year      int       `json:"year"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int        `gorm:"primaryKey" json:"id"`
+	Name      string     `json:"name"`
+	Year      int        `json:"year"`
+	IsActive  *bool      `json:"is_active"`
+	StartDate *time.Time `json:"start_date"`
+	EndDate   *time.Time `json:"end_date"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 
 	Students []Student `json:"students"`
 }
