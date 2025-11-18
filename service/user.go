@@ -17,7 +17,7 @@ type UserService interface {
 
 	// CheckPassLength(pass string) bool
 	// CheckPassAlphabet(pass string) bool
-	
+
 }
 
 type userService struct {
@@ -42,7 +42,7 @@ func (s *userService) Login(user model.User) (token *string, usr model.User, err
 	// 	return nil, 0, errors.New("wrong email or password")
 	// }
 
-	expirationTime := time.Now().Add(10 * time.Minute)
+	expirationTime := time.Now().Add(12 * time.Hour)
 	claims := model.Claims{
 		UserID: dbUser.ID,
 		StandardClaims: jwt.StandardClaims{
