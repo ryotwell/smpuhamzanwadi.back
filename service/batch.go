@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"project_sdu/model"
 	"project_sdu/repository"
 )
@@ -29,6 +30,12 @@ func (s *batchService) Create(batch *model.Batch) error {
 }
 
 func (s *batchService) Update(id int, batch *model.Batch) error {
+	batchExist, _ := s.batchRepo.GetActiveBatch()
+
+	if batchExist != nil && *batch.IsActive{
+		return errors.New("there is already batch active")
+	}
+
 	if err := s.batchRepo.Update(id, batch); err != nil {
 		return err
 	}
