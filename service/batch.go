@@ -33,7 +33,7 @@ func (s *batchService) Update(id int, batch *model.Batch) error {
 	batchExist, _ := s.batchRepo.GetActiveBatch()
 
 	if batchExist != nil && *batch.IsActive{
-		return errors.New("there is already batch active")
+		return errors.New("there is already an active batch")
 	}
 
 	if err := s.batchRepo.Update(id, batch); err != nil {
