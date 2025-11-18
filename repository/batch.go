@@ -44,7 +44,7 @@ func (r *batchRepository) GetByYear(year int) (*model.Batch, error) {
 func (r *batchRepository) Create(batch *model.Batch) error {
 	err := r.db.Where("year = ?", batch.Year).First(&batch).Error
 	if err == nil {
-		return errors.New("Batch already exist")
+		return errors.New("batch already exist")
 	}
 
 	if err == gorm.ErrRecordNotFound {

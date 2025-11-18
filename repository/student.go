@@ -100,7 +100,7 @@ func (r *studentRepository) GetAll(limit int, page int, q string, batchID *int) 
 	}
 
 	// Filter berdasarkan Batch ID (jika diberikan)
-	if batchID != nil {
+	if batchID != nil && *batchID != 0 {
 		db = db.Where("batch_id = ?", *batchID)
 	}
 
