@@ -12,7 +12,7 @@ type BatchRepository interface {
 	GetByYear(year int) (*model.Batch, error)
 	Create(batch *model.Batch) error
 	GetOrCreateByYear(year int) (*model.Batch, error)
-	GetAll(limit, page int) ([]model.Batch, error)
+	GetAll(limit, page int, q string) ([]model.Batch, error)
 	GetActiveBatch() (*model.Batch, error)
 	GetByID(id int) (*model.Batch, error)
 	Update(id int, batch *model.Batch) error
@@ -55,12 +55,19 @@ func (r *batchRepository) Create(batch *model.Batch) error {
 	return nil
 }
 
-func (r *batchRepository) GetAll(limit, page int) ([]model.Batch, error) {
+func (r *batchRepository) GetAll(limit, page int, q string) ([]model.Batch, error) {
 	var batches []model.Batch
 
 	offset := (page - 1) * limit
 
-	err := r.db.
+	db := r.db
+
+	// Filter search name
+	if q != "" {
+		db = db.Where("name ILIKE ?", "%"+q+"%")
+	}
+
+	err := db.
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).

@@ -195,11 +195,12 @@ func (b *batchAPI) GetByID(c *gin.Context) {
 func (b *batchAPI) GetAll(c *gin.Context) {
 	limitParam := c.DefaultQuery("limit", "10")
 	pageParam := c.DefaultQuery("page", "1")
+	q := c.Query("q")
 
 	limit, _ := strconv.Atoi(limitParam)
 	page, _ := strconv.Atoi(pageParam)
 
-	data, err := b.batchService.GetAll(limit, page)
+	data, err := b.batchService.GetAll(limit, page, q)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,

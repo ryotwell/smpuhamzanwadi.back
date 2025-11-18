@@ -10,7 +10,7 @@ type BatchService interface {
 	Update(id int, batch *model.Batch) error
 	Delete(id int) error
 	GetByID(id int) (*model.Batch, error)
-	GetAll(limit, page int) ([]model.Batch, error)
+	GetAll(limit, page int, q string) ([]model.Batch, error)
 }
 
 type batchService struct {
@@ -51,8 +51,8 @@ func (s *batchService) GetByID(id int) (*model.Batch, error) {
 	return batch, nil
 }
 
-func (s *batchService) GetAll(limit, page int) ([]model.Batch, error) {
-	batches, err := s.batchRepo.GetAll(limit, page)
+func (s *batchService) GetAll(limit, page int, q string) ([]model.Batch, error) {
+	batches, err := s.batchRepo.GetAll(limit, page, q)
 	if err != nil {
 		return nil, err
 	}
