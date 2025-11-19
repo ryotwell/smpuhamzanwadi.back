@@ -105,6 +105,9 @@ func (s *studentAPI) CreateStudent(c *gin.Context) {
 	})
 }
 
+// ====================
+// BULK ADD STUDENT
+// ====================
 func (s *studentAPI) CreateManyStudents(c *gin.Context) {
 	var students []model.Student
 	if err := c.ShouldBindJSON(&students); err != nil {
@@ -156,6 +159,9 @@ func (s *studentAPI) GetStudentByID(c *gin.Context) {
 	})
 }
 
+// ====================
+// GET STUDENT BY BATCH YEAR
+// ====================
 func (s *studentAPI) GetStudentsByBatchYear(c *gin.Context) {
 	yearStr := c.Param("year")
 	limitParam := c.DefaultQuery("limit", "10")

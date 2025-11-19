@@ -48,6 +48,5 @@ func Auth() gin.HandlerFunc {
 		ctx.Set("id", claims.UserID)
 
 		ctx.Next()
-		// TODO: answer here
 	})
 }

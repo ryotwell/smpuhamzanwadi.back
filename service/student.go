@@ -30,7 +30,6 @@ func NewStudentService(studentRepo repository.StudentRepository, parentRepo repo
 	}
 }
 
-// CreateStudent menyimpan student beserta parent-nya jika ada
 func (s *studentService) CreateStudent(student *model.Student) error {
 	var parentCreated bool
 	if student.Parent != nil {
@@ -73,41 +72,6 @@ func (s *studentService) CreateStudent(student *model.Student) error {
 
 	return nil
 }
-
-// func (s *studentService) CreateStudent(student *model.Student) error {
-// 	var parentCreated bool
-// 	var year int
-// 	if student.Parent != nil {
-// 		if err := s.parentRepo.Create(student.Parent); err != nil {
-// 			return err
-// 		}
-// 		parentCreated = true
-// 		student.ParentId = &student.Parent.ID
-// 	}
-
-// 	if student.Batch != nil {
-// 		year = student.Batch.Year
-// 	} else {
-// 		year = time.Now().Year()
-// 	}
-
-// 	batch, err := s.batchRepo.GetOrCreateByYear(year)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	student.BatchId = &batch.ID
-// 	student.Batch = nil
-
-// 	if err := s.studentRepo.Create(student); err != nil {
-// 		if parentCreated && student.Parent != nil {
-// 			_ = s.parentRepo.Delete(student.Parent.ID)
-// 		}
-// 		return err
-// 	}
-
-// 	return nil
-// }
 
 func (s *studentService) GetStudentsByBatchYear(year, limit, page int, q string) ([]model.Student, error) {
 	batch, err := s.batchRepo.GetByYear(year)

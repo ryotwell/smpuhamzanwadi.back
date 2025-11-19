@@ -27,7 +27,9 @@ func NewUserAPI(userService service.UserService) *userAPI {
 	return &userAPI{userService}
 }
 
-// REGISTER
+// ====================
+// REGISTRATION
+// ====================
 func (u *userAPI) Register(c *gin.Context) {
 	var req model.UserRegister
 
@@ -43,7 +45,7 @@ func (u *userAPI) Register(c *gin.Context) {
 		return
 	}
 
-	// Validasi data kosong
+	// Minimal Validation
 	errors := make(map[string]string)
 	if req.Fullname == "" {
 		errors["fullname"] = "Fullname is required"
@@ -65,7 +67,7 @@ func (u *userAPI) Register(c *gin.Context) {
 		return
 	}
 
-	// Hash password sebelum disimpan
+	// Hash password before saving
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
@@ -108,7 +110,9 @@ func (u *userAPI) Register(c *gin.Context) {
 	})
 }
 
+// ====================
 // LOGIN
+// ====================
 func (u *userAPI) Login(c *gin.Context) {
 	var req model.User
 
@@ -124,7 +128,7 @@ func (u *userAPI) Login(c *gin.Context) {
 		return
 	}
 
-	// Validasi input
+	// Minimal validation
 	errors := make(map[string]string)
 	if req.Email == "" {
 		errors["email"] = "Email is required"
@@ -155,7 +159,7 @@ func (u *userAPI) Login(c *gin.Context) {
 		return
 	}
 
-	// Simpan token ke cookie
+	// Save token to cookie
 	c.SetCookie("session_token", *token, int((12 * time.Hour).Seconds()), "/", "", false, true)
 
 	c.JSON(http.StatusOK, model.SuccessResponse{
@@ -170,7 +174,9 @@ func (u *userAPI) Login(c *gin.Context) {
 	})
 }
 
+// ====================
 // LOGOUT
+// ====================
 func (u *userAPI) Logout(c *gin.Context) {
 
 	c.SetCookie(
@@ -190,7 +196,9 @@ func (u *userAPI) Logout(c *gin.Context) {
 	})
 }
 
+// ====================
 // GET USER PROFILE
+// ====================
 func (u *userAPI) GetUserProfile(c *gin.Context) {
 	cookie, err := c.Cookie("session_token")
 	if err != nil {

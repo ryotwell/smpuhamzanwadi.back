@@ -22,12 +22,10 @@ func NewParentRepo(db *gorm.DB) ParentRepository {
 	return &parentRepository{db}
 }
 
-// Create a new parent
 func (r *parentRepository) Create(parent *model.Parent) error {
 	return r.db.Create(parent).Error
 }
 
-// Get all parent with pagination support and sort the names in alphabetical order
 func (r *parentRepository) GetAll(limit int, offset int) ([]model.Parent, error) {
 	var parents []model.Parent
 
@@ -44,7 +42,6 @@ func (r *parentRepository) GetAll(limit int, offset int) ([]model.Parent, error)
 	return parents, nil
 }
 
-// Get parent by ID
 func (r *parentRepository) GetByID(id int) (*model.Parent, error) {
 	var parent model.Parent
 	err := r.db.First(&parent, id).Error
@@ -54,7 +51,6 @@ func (r *parentRepository) GetByID(id int) (*model.Parent, error) {
 	return &parent, nil
 }
 
-// Update parent data by ID
 func (r *parentRepository) Update(id int, parent *model.Parent) error {
 	if err := r.db.Model(&model.Parent{}).
 		Where("id = ?", id).
@@ -66,7 +62,6 @@ func (r *parentRepository) Update(id int, parent *model.Parent) error {
 	return nil
 }
 
-// Delete parent by ID
 func (r *parentRepository) Delete(id int) error {
 	return r.db.Delete(&model.Parent{}, id).Error
 }

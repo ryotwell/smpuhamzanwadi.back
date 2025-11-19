@@ -38,10 +38,6 @@ func (s *userService) Login(user model.User) (token *string, usr model.User, err
 		return nil, model.User{}, errors.New("wrong email or password")
 	}
 
-	// if dbUser.Email != user.Email || dbUser.Password != user.Password {
-	// 	return nil, 0, errors.New("wrong email or password")
-	// }
-
 	expirationTime := time.Now().Add(12 * time.Hour)
 	claims := model.Claims{
 		UserID: dbUser.ID,
@@ -61,9 +57,6 @@ func (s *userService) Login(user model.User) (token *string, usr model.User, err
 
 func (s *userService) Register(user model.User) error {
 	dbUser, _ := s.userRepository.CheckAvail(user)
-	// if err != nil {
-	// 	return err
-	// }
 
 	if dbUser.Email != "" || dbUser.ID != 0 {
 		return errors.New("email already exists")
