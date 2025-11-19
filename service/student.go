@@ -4,6 +4,7 @@ import (
 	"errors"
 	"project_sdu/model"
 	"project_sdu/repository"
+	"time"
 )
 
 type StudentService interface {
@@ -40,12 +41,24 @@ func (s *studentService) CreateStudent(student *model.Student) error {
 		student.ParentId = &student.Parent.ID
 	}
 
+	// check if there is an active batch
 	activeBatch, err := s.batchRepo.GetActiveBatch()
 	if err != nil {
 		if parentCreated && student.Parent != nil {
 			_ = s.parentRepo.Delete(student.Parent.ID)
 		}
 		return errors.New("currently there is no batch active")
+	}
+
+	// validate the date
+	now := time.Now()
+
+	if activeBatch.StartDate == nil || activeBatch.EndDate == nil {
+		return errors.New("batch has invalid start_date or end_date")
+	}
+
+	if now.Before(*activeBatch.StartDate) || now.After(*activeBatch.EndDate) {
+		return errors.New("the registration period has ended")
 	}
 
 	student.BatchId = &activeBatch.ID
