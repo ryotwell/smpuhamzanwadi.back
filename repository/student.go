@@ -74,6 +74,7 @@ func (r *studentRepository) GetByID(id int) (*model.Student, error) {
 	var student model.Student
 	err := r.db.
 		Preload("Parent").
+		Preload("Batch").
 		First(&student, id).
 		Error
 
@@ -103,6 +104,7 @@ func (r *studentRepository) GetAll(limit int, page int, q string, batchID *int) 
 
 	err := db.
 		Preload("Parent").
+		Preload("Batch").
 		Order("full_name ASC").
 		Limit(limit).
 		Offset(offset).
