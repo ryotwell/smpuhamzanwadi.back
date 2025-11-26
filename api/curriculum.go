@@ -9,27 +9,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ExtracurricularAPI interface {
+type CurriculumAPI interface {
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 	GetByID(c *gin.Context)
 	GetAll(c *gin.Context)
+	GetByCategory(c *gin.Context)
 }
 
-type extracurricularAPI struct {
-	exService service.ExtracurricularService
+type curriculumAPI struct {
+	curriculumService service.CurriculumService
 }
 
-func NewExtracurricularAPI(exService service.ExtracurricularService) *extracurricularAPI {
-	return &extracurricularAPI{exService}
+func NewCurriculumAPI(curriculumService service.CurriculumService) *curriculumAPI {
+	return &curriculumAPI{curriculumService}
 }
 
 // ====================
 // CREATE
 // ====================
-func (e *extracurricularAPI) Create(c *gin.Context) {
-	var ex model.Extracurricular
+func (e *curriculumAPI) Create(c *gin.Context) {
+	var ex model.Curriculum
 	if err := c.ShouldBindJSON(&ex); err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
@@ -50,11 +51,11 @@ func (e *extracurricularAPI) Create(c *gin.Context) {
 		return
 	}
 
-	if err := e.exService.Create(&ex); err != nil {
+	if err := e.curriculumService.Create(&ex); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to create extracurricular",
+			Message: "Failed to create curriculum",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -63,7 +64,7 @@ func (e *extracurricularAPI) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusCreated,
-		Message: "Extracurricular created successfully",
+		Message: "curriculum created successfully",
 		Data:    ex,
 	})
 }
@@ -71,7 +72,7 @@ func (e *extracurricularAPI) Create(c *gin.Context) {
 // ====================
 // UPDATE
 // ====================
-func (e *extracurricularAPI) Update(c *gin.Context) {
+func (e *curriculumAPI) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -83,7 +84,7 @@ func (e *extracurricularAPI) Update(c *gin.Context) {
 		return
 	}
 
-	var ex model.Extracurricular
+	var ex model.Curriculum
 	if err := c.ShouldBindJSON(&ex); err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Success: false,
@@ -94,11 +95,11 @@ func (e *extracurricularAPI) Update(c *gin.Context) {
 		return
 	}
 
-	if err := e.exService.Update(id, &ex); err != nil {
+	if err := e.curriculumService.Update(id, &ex); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to update extracurricular",
+			Message: "Failed to update curriculum",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -107,7 +108,7 @@ func (e *extracurricularAPI) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Extracurricular updated successfully",
+		Message: "curriculum updated successfully",
 		Data:    ex,
 	})
 }
@@ -115,7 +116,7 @@ func (e *extracurricularAPI) Update(c *gin.Context) {
 // ====================
 // DELETE
 // ====================
-func (e *extracurricularAPI) Delete(c *gin.Context) {
+func (e *curriculumAPI) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -127,11 +128,11 @@ func (e *extracurricularAPI) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := e.exService.Delete(id); err != nil {
+	if err := e.curriculumService.Delete(id); err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to delete extracurricular",
+			Message: "Failed to delete curriculum",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -140,14 +141,14 @@ func (e *extracurricularAPI) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Extracurricular deleted successfully",
+		Message: "curriculum deleted successfully",
 	})
 }
 
 // ====================
 // GET BY ID
 // ====================
-func (e *extracurricularAPI) GetByID(c *gin.Context) {
+func (e *curriculumAPI) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -159,12 +160,12 @@ func (e *extracurricularAPI) GetByID(c *gin.Context) {
 		return
 	}
 
-	ex, err := e.exService.GetByID(id)
+	ex, err := e.curriculumService.GetByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusNotFound,
-			Message: "Extracurricular not found",
+			Message: "curriculum not found",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -173,7 +174,7 @@ func (e *extracurricularAPI) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Extracurricular retrieved successfully",
+		Message: "curriculum retrieved successfully",
 		Data:    ex,
 	})
 }
@@ -181,19 +182,19 @@ func (e *extracurricularAPI) GetByID(c *gin.Context) {
 // ====================
 // GET ALL
 // ====================
-func (e *extracurricularAPI) GetAll(c *gin.Context) {
+func (e *curriculumAPI) GetAll(c *gin.Context) {
 	limitParam := c.DefaultQuery("limit", "10")
 	pageParam := c.DefaultQuery("page", "1")
 
 	limit, _ := strconv.Atoi(limitParam)
 	page, _ := strconv.Atoi(pageParam)
 
-	data, err := e.exService.GetAll(limit, page)
+	data, err := e.curriculumService.GetAll(limit, page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusInternalServerError,
-			Message: "Failed to retrieve extracurricular",
+			Message: "Failed to retrieve curriculum",
 			Errors:  map[string]string{"server": err.Error()},
 		})
 		return
@@ -202,11 +203,56 @@ func (e *extracurricularAPI) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
 		Status:  http.StatusOK,
-		Message: "Extracurricular retrieved successfully",
+		Message: "curriculum retrieved successfully",
 		Data:    data,
 		Meta: gin.H{
 			"page":  page,
 			"limit": limit,
+		},
+	})
+}
+
+// ====================
+// GET BY CATEGORY
+// ====================
+func (e *curriculumAPI) GetByCategory(c *gin.Context) {
+	category := c.Param("category")
+	if category == "" {
+		c.JSON(http.StatusBadRequest, model.ErrorResponse{
+			Success: false,
+			Status:  http.StatusBadRequest,
+			Message: "Category is required",
+			Errors:  map[string]string{"category": "category cannot be empty"},
+		})
+		return
+	}
+
+	limitParam := c.DefaultQuery("limit", "10")
+	pageParam := c.DefaultQuery("page", "1")
+
+	limit, _ := strconv.Atoi(limitParam)
+	page, _ := strconv.Atoi(pageParam)
+
+	data, err := e.curriculumService.GetByCategory(category, limit, page)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Success: false,
+			Status:  http.StatusInternalServerError,
+			Message: "Failed to retrieve curriculum by category",
+			Errors:  map[string]string{"server": err.Error()},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.SuccessResponse{
+		Success: true,
+		Status:  http.StatusOK,
+		Message: "curriculum by category retrieved successfully",
+		Data:    data,
+		Meta: gin.H{
+			"page":     page,
+			"limit":    limit,
+			"category": category,
 		},
 	})
 }

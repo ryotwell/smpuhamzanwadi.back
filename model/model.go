@@ -268,16 +268,25 @@ type Facility struct {
 }
 
 // ======================
-// EXTRACURRICULAR
+// CURRICULUM
 // ======================
 
-type Extracurricular struct {
-	ID          int       `gorm:"primaryKey" json:"id"`
-	Name        string    `json:"name"`
-	Image       *string   `json:"image"`
-	Description *string   `json:"description"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+type CurriculumCategory string
+
+const (
+	Extracurricular CurriculumCategory = "EXTRACURRICULAR"
+	ProgramUnggulan CurriculumCategory = "PROGRAM UNGGULAN"
+	KOCuricullar    CurriculumCategory = "KO-CULLICULAR"
+)
+
+type Curriculum struct {
+	ID          int                 `gorm:"primaryKey" json:"id"`
+	Name        string              `json:"name"`
+	Image       *string             `json:"image"`
+	Category    *CurriculumCategory `json:"category"`
+	Description *string             `json:"description"`
+	CreatedAt   time.Time           `json:"created_at"`
+	UpdatedAt   time.Time           `json:"updated_at"`
 }
 
 // ======================

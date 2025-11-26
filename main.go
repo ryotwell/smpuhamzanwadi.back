@@ -23,13 +23,13 @@ import (
 )
 
 type APIHandler struct {
-	UserAPIHandler     api.UserAPI
-	StudentAPIHandler  api.StudentAPI
-	ParentAPIHandler   api.ParentAPI
-	PostAPIHandler     api.PostAPI
-	ExtraAPIHandler    api.ExtracurricularAPI
-	FacilityAPIHandler api.FacilityAPI
-	BatchAPIHandler    api.BatchAPI
+	UserAPIHandler       api.UserAPI
+	StudentAPIHandler    api.StudentAPI
+	ParentAPIHandler     api.ParentAPI
+	PostAPIHandler       api.PostAPI
+	CurriculumAPIHandler api.CurriculumAPI
+	FacilityAPIHandler   api.FacilityAPI
+	BatchAPIHandler      api.BatchAPI
 }
 
 func main() {
@@ -77,7 +77,7 @@ func main() {
 
 	// Migration
 	conn.AutoMigrate(
-		&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Extracurricular{}, &model.Facility{}, &model.Batch{},
+		&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Curriculum{}, &model.Facility{}, &model.Batch{},
 	)
 
 	// Route
@@ -103,7 +103,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	studentRepo := repo.NewStudentRepo(dbConn)
 	parentRepo := repo.NewParentRepo(dbConn)
 	postRepo := repo.NewPostRepo(dbConn)
-	extraRepo := repo.NewExtracurricularRepository(dbConn)
+	curriculumRepo := repo.NewCurriculumRepository(dbConn)
 	facilityRepo := repo.NewFacilityRepository(dbConn)
 	batchRepo := repo.NewBatchRepository(dbConn)
 
@@ -111,7 +111,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	studentService := service.NewStudentService(studentRepo, parentRepo, batchRepo)
 	parentService := service.NewParentService(parentRepo)
 	postService := service.NewPostService(postRepo)
-	extraService := service.NewExtracurricularService(extraRepo)
+	curriculumService := service.NewCurriculumService(curriculumRepo)
 	facilityService := service.NewfacilityService(facilityRepo)
 	batchService := service.NewBatchService(batchRepo)
 
@@ -119,18 +119,18 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	studentAPIHandler := api.NewStudentAPI(studentService)
 	parentAPIHandler := api.NewParentAPI(parentService)
 	postAPIHandler := api.NewPostAPI(postService)
-	extraAPIHandler := api.NewExtracurricularAPI(extraService)
+	curriculumAPIHandler := api.NewCurriculumAPI(curriculumService)
 	facilityAPIHandler := api.NewFacilityAPI(facilityService)
 	batchAPIHandler := api.NewBatchAPI(batchService)
 
 	apiHandler := APIHandler{
-		UserAPIHandler:     userAPIHandler,
-		StudentAPIHandler:  studentAPIHandler,
-		ParentAPIHandler:   parentAPIHandler,
-		PostAPIHandler:     postAPIHandler,
-		ExtraAPIHandler:    extraAPIHandler,
-		FacilityAPIHandler: facilityAPIHandler,
-		BatchAPIHandler:    batchAPIHandler,
+		UserAPIHandler:       userAPIHandler,
+		StudentAPIHandler:    studentAPIHandler,
+		ParentAPIHandler:     parentAPIHandler,
+		PostAPIHandler:       postAPIHandler,
+		CurriculumAPIHandler: curriculumAPIHandler,
+		FacilityAPIHandler:   facilityAPIHandler,
+		BatchAPIHandler:      batchAPIHandler,
 	}
 
 	// ROUTES //
@@ -190,16 +190,17 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		post.DELETE("/delete/:slug", apiHandler.PostAPIHandler.DeletePost)
 	}
 
-	// Extracurricular routes
-	extracurricular := r.Group("/extracurricular")
+	// Curriculum routes
+	extracurricular := r.Group("/curriculum")
 	{
-		extracurricular.GET("/get-all", apiHandler.ExtraAPIHandler.GetAll)
-		extracurricular.GET("/get/:id", apiHandler.ExtraAPIHandler.GetByID)
+		extracurricular.GET("/get-all", apiHandler.CurriculumAPIHandler.GetAll)
+		extracurricular.GET("/get/:id", apiHandler.CurriculumAPIHandler.GetByID)
+		extracurricular.GET("/category/:category", apiHandler.CurriculumAPIHandler.GetByCategory)
 
 		extracurricular.Use(middleware.Auth())
-		extracurricular.POST("/add", apiHandler.ExtraAPIHandler.Create)
-		extracurricular.PUT("/update/:id", apiHandler.ExtraAPIHandler.Update)
-		extracurricular.DELETE("/delete/:id", apiHandler.ExtraAPIHandler.Delete)
+		extracurricular.POST("/add", apiHandler.CurriculumAPIHandler.Create)
+		extracurricular.PUT("/update/:id", apiHandler.CurriculumAPIHandler.Update)
+		extracurricular.DELETE("/delete/:id", apiHandler.CurriculumAPIHandler.Delete)
 	}
 
 	// Facility routes
