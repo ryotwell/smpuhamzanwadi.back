@@ -46,16 +46,16 @@ func (d *dashboardAPI) GetDashboard(c *gin.Context) {
 		return
 	}
 
-	totalStudentsActiveBatch, err := d.dashboardService.GetTotalStudentsActiveBatch()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
-			Success: false,
-			Status:  http.StatusInternalServerError,
-			Message: "Failed to count students from active batch",
-			Errors:  map[string]string{"server": err.Error()},
-		})
-		return
-	}
+	totalStudentsActiveBatch, _ := d.dashboardService.GetTotalStudentsActiveBatch()
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+	// 		Success: false,
+	// 		Status:  http.StatusInternalServerError,
+	// 		Message: "Failed to count students from active batch",
+	// 		Errors:  map[string]string{"server": err.Error()},
+	// 	})
+	// 	return
+	// }
 
 	totalBatch, err := d.dashboardService.GetTotalBatch()
 	if err != nil {
@@ -68,16 +68,16 @@ func (d *dashboardAPI) GetDashboard(c *gin.Context) {
 		return
 	}
 
-	activeBatch, err := d.dashboardService.GetActiveBatch()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
-			Success: false,
-			Status:  http.StatusInternalServerError,
-			Message: "Failed to get active batch",
-			Errors:  map[string]string{"server": err.Error()},
-		})
-		return
-	}
+	activeBatch, _ := d.dashboardService.GetActiveBatch()
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+	// 		Success: false,
+	// 		Status:  http.StatusInternalServerError,
+	// 		Message: "Failed to get active batch",
+	// 		Errors:  map[string]string{"server": err.Error()},
+	// 	})
+	// 	return
+	// }
 
 	// Response Data
 	data := gin.H{
