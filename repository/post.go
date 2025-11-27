@@ -14,6 +14,7 @@ type PostRepository interface {
 	GetBySlug(slug string) (*model.Post, error)
 	GetAll(limit, page int, q string) ([]model.Post, error)
 	GetPublished(limit, offset int) ([]model.Post, error)
+	CountAll() (int, error)
 }
 
 type postRepository struct {
@@ -86,4 +87,15 @@ func (r *postRepository) GetPublished(limit, offset int) ([]model.Post, error) {
 		Offset(offset).
 		Find(&posts).Error
 	return posts, err
+}
+
+func (r *postRepository) CountAll() (int, error) {
+	var count int64
+
+	err := r.db.Model(&model.Post{}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return int(count), nil
 }

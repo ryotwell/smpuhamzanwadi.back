@@ -30,6 +30,7 @@ type APIHandler struct {
 	CurriculumAPIHandler api.CurriculumAPI
 	FacilityAPIHandler   api.FacilityAPI
 	BatchAPIHandler      api.BatchAPI
+	DashboardAPIHanlder  api.DashboardAPI
 }
 
 func main() {
@@ -114,6 +115,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	curriculumService := service.NewCurriculumService(curriculumRepo)
 	facilityService := service.NewfacilityService(facilityRepo)
 	batchService := service.NewBatchService(batchRepo)
+	dashboardService := service.NewDashboardService(studentRepo, postRepo, batchRepo)
 
 	userAPIHandler := api.NewUserAPI(userService)
 	studentAPIHandler := api.NewStudentAPI(studentService)
@@ -122,6 +124,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	curriculumAPIHandler := api.NewCurriculumAPI(curriculumService)
 	facilityAPIHandler := api.NewFacilityAPI(facilityService)
 	batchAPIHandler := api.NewBatchAPI(batchService)
+	dashboardAPIHanlder := api.NewDashboardAPI(dashboardService)
 
 	apiHandler := APIHandler{
 		UserAPIHandler:       userAPIHandler,
@@ -131,6 +134,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		CurriculumAPIHandler: curriculumAPIHandler,
 		FacilityAPIHandler:   facilityAPIHandler,
 		BatchAPIHandler:      batchAPIHandler,
+		DashboardAPIHanlder:  dashboardAPIHanlder,
 	}
 
 	// ROUTES //
@@ -215,6 +219,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		facility.DELETE("/delete/:id", apiHandler.FacilityAPIHandler.DeleteFacility)
 	}
 
+	// Batch routes
 	batch := r.Group("/batch")
 	{
 		batch.Use(middleware.Auth())
@@ -224,5 +229,12 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		batch.PUT("/update/:id", apiHandler.BatchAPIHandler.Update)
 		batch.DELETE("/delete/:id", apiHandler.BatchAPIHandler.Delete)
 	}
-	return r
+
+	dashboard := r.Group("/dashboard")
+	{
+		dashboard.Use(middleware.Auth())
+		dashboard.GET("/", apiHandler.DashboardAPIHanlder.GetDashboard)
+
+		return r
+	}
 }

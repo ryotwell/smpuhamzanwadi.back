@@ -17,6 +17,7 @@ type BatchRepository interface {
 	GetByID(id int) (*model.Batch, error)
 	Update(id int, batch *model.Batch) error
 	Delete(id int) error
+	CountAll() (int, error)
 }
 
 type batchRepository struct {
@@ -133,4 +134,15 @@ func (r *batchRepository) Update(id int, batch *model.Batch) error {
 
 func (r *batchRepository) Delete(id int) error {
 	return r.db.Delete(&model.Batch{}, id).Error
+}
+
+func (r *batchRepository) CountAll() (int, error) {
+	var count int64
+
+	err := r.db.Model(&model.Batch{}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return int(count), nil
 }

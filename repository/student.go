@@ -20,6 +20,8 @@ type StudentRepository interface {
 	GetAll(limit int, page int, q string, batchID *int) ([]model.Student, error)
 	Update(id int, student *model.Student) error
 	Delete(id int) error
+	CountAll() (int, error)
+	CountByBatchID(batchID int) (int, error)
 }
 
 type studentRepository struct {
@@ -139,4 +141,18 @@ func (r *studentRepository) Update(id int, student *model.Student) error {
 
 func (r *studentRepository) Delete(id int) error {
 	return r.db.Delete(&model.Student{}, id).Error
+}
+
+func (r *studentRepository) CountAll() (int, error) {
+	var count int64
+	err := r.db.Model(&model.Student{}).Count(&count).Error
+	return int(count), err
+}
+
+func (r *studentRepository) CountByBatchID(batchID int) (int, error) {
+	var count int64
+	err := r.db.Model(&model.Student{}).
+		Where("batch_id = ?", batchID).
+		Count(&count).Error
+	return int(count), err
 }
