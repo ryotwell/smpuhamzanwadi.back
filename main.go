@@ -235,6 +235,6 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 		dashboard.Use(middleware.Auth())
 		dashboard.GET("/", apiHandler.DashboardAPIHanlder.GetDashboard)
 
-		return r
 	}
+	return r
 }
