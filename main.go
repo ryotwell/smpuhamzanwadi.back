@@ -97,8 +97,8 @@ func main() {
 
 }
 
-func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
-	dbConn := conn.(*gorm.DB)
+func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
+	dbConn := conn
 
 	userRepo := repo.NewUserRepo(dbConn)
 	studentRepo := repo.NewStudentRepo(dbConn)
@@ -234,7 +234,7 @@ func RunServer(r *gin.Engine, conn interface{}) *gin.Engine {
 	{
 		dashboard.Use(middleware.Auth())
 		dashboard.GET("/", apiHandler.DashboardAPIHanlder.GetDashboard)
-
 	}
+	
 	return r
 }
