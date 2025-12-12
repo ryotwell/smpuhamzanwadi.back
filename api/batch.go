@@ -15,6 +15,7 @@ type BatchAPI interface {
 	Delete(c *gin.Context)
 	GetByID(c *gin.Context)
 	GetAll(c *gin.Context)
+	GetActiveBatch(c *gin.Context)
 }
 
 type batchAPI struct {
@@ -220,5 +221,39 @@ func (b *batchAPI) GetAll(c *gin.Context) {
 			"page":  page,
 			"limit": limit,
 		},
+	})
+}
+
+// ====================
+// GET Active Batch
+// ====================
+func (b *batchAPI) GetActiveBatch(c *gin.Context) {
+	// idParam := c.Param("id")
+	// id, err := strconv.Atoi(idParam)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, model.ErrorResponse{
+	// 		Success: false,
+	// 		Status:  http.StatusBadRequest,
+	// 		Message: "Invalid ID",
+	// 	})
+	// 	return
+	// }
+
+	batch, err := b.batchService.GetActiveBatch()
+	if err != nil {
+		c.JSON(http.StatusNotFound, model.ErrorResponse{
+			Success: false,
+			Status:  http.StatusNotFound,
+			Message: "Batch not found",
+			Errors:  map[string]string{"server": err.Error()},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.SuccessResponse{
+		Success: true,
+		Status:  http.StatusOK,
+		Message: "Batch retrieved successfully",
+		Data:    batch,
 	})
 }

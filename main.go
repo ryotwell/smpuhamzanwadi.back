@@ -222,6 +222,7 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 	// Batch routes
 	batch := r.Group("/batch")
 	{
+		batch.GET("/get-active", apiHandler.BatchAPIHandler.GetActiveBatch)
 		batch.Use(middleware.Auth())
 		batch.GET("/get-all", apiHandler.BatchAPIHandler.GetAll)
 		batch.GET("/get/:id", apiHandler.BatchAPIHandler.GetByID)
@@ -235,6 +236,6 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 		dashboard.Use(middleware.Auth())
 		dashboard.GET("/", apiHandler.DashboardAPIHanlder.GetDashboard)
 	}
-	
+
 	return r
 }

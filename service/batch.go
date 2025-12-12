@@ -12,6 +12,7 @@ type BatchService interface {
 	Delete(id int) error
 	GetByID(id int) (*model.Batch, error)
 	GetAll(limit, page int, q string) ([]model.Batch, error)
+	GetActiveBatch() (*model.Batch, error)
 }
 
 type batchService struct {
@@ -65,4 +66,13 @@ func (s *batchService) GetAll(limit, page int, q string) ([]model.Batch, error) 
 	}
 
 	return batches, nil
+}
+
+func (s *batchService) GetActiveBatch() (*model.Batch, error) {
+	batch, err := s.batchRepo.GetActiveBatch()
+	if err != nil {
+		return nil, err
+	}
+
+	return batch, nil
 }
