@@ -11,7 +11,7 @@ type StudentService interface {
 	CreateStudent(student *model.Student) error
 	GetStudentByID(id int) (*model.Student, error)
 	GetStudentsByBatchYear(year, limit, page int, q string) ([]model.Student, error)
-	GetAllStudents(limit int, page int, q string, batchID *int) ([]model.Student, error)
+	GetAllStudents(limit int, page int, q string, batchID *int, isAccepted *bool) ([]model.Student, error)
 	UpdateStudent(id int, student *model.Student) error
 	DeleteStudent(id int) error
 }
@@ -90,8 +90,8 @@ func (s *studentService) GetStudentByID(id int) (*model.Student, error) {
 	return student, nil
 }
 
-func (s *studentService) GetAllStudents(limit int, page int, q string, batchID *int) ([]model.Student, error) {
-	return s.studentRepo.GetAll(limit, page, q, batchID)
+func (s *studentService) GetAllStudents(limit int, page int, q string, batchID *int, isAccepted *bool) ([]model.Student, error) {
+	return s.studentRepo.GetAll(limit, page, q, batchID, isAccepted)
 }
 
 func (s *studentService) UpdateStudent(id int, student *model.Student) error {

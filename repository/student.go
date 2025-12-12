@@ -17,7 +17,7 @@ type StudentRepository interface {
 	Create(student *model.Student) error
 	GetStudentsByBatchID(batchID int, limit int, page int, q string) ([]model.Student, error)
 	GetByID(id int) (*model.Student, error)
-	GetAll(limit int, page int, q string, batchID *int) ([]model.Student, error)
+	GetAll(limit int, page int, q string, batchID *int, isAccepted *bool) ([]model.Student, error)
 	Update(id int, student *model.Student) error
 	Delete(id int) error
 	CountAll() (int, error)
@@ -87,7 +87,7 @@ func (r *studentRepository) GetByID(id int) (*model.Student, error) {
 	return &student, nil
 }
 
-func (r *studentRepository) GetAll(limit int, page int, q string, batchID *int) ([]model.Student, error) {
+func (r *studentRepository) GetAll(limit int, page int, q string, batchID *int, isAccepted *bool) ([]model.Student, error) {
 	var students []model.Student
 
 	offset := (page - 1) * limit
@@ -102,6 +102,11 @@ func (r *studentRepository) GetAll(limit int, page int, q string, batchID *int) 
 	// Filter based on batch id
 	if batchID != nil && *batchID != 0 {
 		db = db.Where("batch_id = ?", *batchID)
+	}
+
+	// Filter by is_accepted (true/false)
+	if isAccepted != nil {
+		db = db.Where("is_accepted = ?", *isAccepted)
 	}
 
 	err := db.

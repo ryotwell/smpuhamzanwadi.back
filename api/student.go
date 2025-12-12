@@ -206,12 +206,28 @@ func (s *studentAPI) GetAllStudents(c *gin.Context) {
 	pageParam := c.DefaultQuery("page", "1")
 	batchparam := c.Query("batch")
 	q := c.Query("q")
+	isAcceptedParam := c.Query("is_accepted") // <-- TAMBAHAN
 
 	limit, _ := strconv.Atoi(limitParam)
 	page, _ := strconv.Atoi(pageParam)
 	batch, _ := strconv.Atoi(batchparam)
 
-	students, err := s.studentService.GetAllStudents(limit, page, q, &batch)
+	// Handle filter is_accepted
+	var isAccepted *bool = nil
+	if isAcceptedParam != "" {
+		parsed, err := strconv.ParseBool(isAcceptedParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, model.ErrorResponse{
+				Success: false,
+				Status:  http.StatusBadRequest,
+				Message: "Invalid value for is_accepted (use true or false)",
+			})
+			return
+		}
+		isAccepted = &parsed
+	}
+
+	students, err := s.studentService.GetAllStudents(limit, page, q, &batch, isAccepted)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
@@ -228,8 +244,10 @@ func (s *studentAPI) GetAllStudents(c *gin.Context) {
 		Message: "Students retrieved successfully",
 		Data:    students,
 		Meta: gin.H{
-			"limit": limit,
-			"page":  page,
+			"limit":       limit,
+			"page":        page,
+			"batch":       batch,
+			"is_accepted": isAccepted,
 		},
 	})
 }

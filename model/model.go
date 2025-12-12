@@ -214,6 +214,7 @@ type Student struct {
 	KartuKeluarga         *string         `json:"kartu_keluarga"`
 	AktaKelahiran         *string         `json:"akta_kelahiran"`
 	IjazahSKL             *string         `json:"ijazah_skl"`
+	IsAccepted            bool            `json:"is_accepted" gorm:"default:false"`
 
 	BloodType       *BloodType `json:"blood_type"`
 	BeratKg         *int       `json:"berat_kg"`
@@ -296,7 +297,7 @@ type Batch struct {
 	ID        int        `gorm:"primaryKey" json:"id"`
 	Name      string     `json:"name"`
 	Year      int        `json:"year"`
-	IsActive  *bool      `json:"is_active"`
+	IsActive  *bool      `json:"is_active" gorm:"default:false"`
 	StartDate *time.Time `json:"start_date"`
 	EndDate   *time.Time `json:"end_date"`
 	CreatedAt time.Time  `json:"created_at"`
