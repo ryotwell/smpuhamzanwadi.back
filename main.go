@@ -31,6 +31,7 @@ type APIHandler struct {
 	FacilityAPIHandler   api.FacilityAPI
 	BatchAPIHandler      api.BatchAPI
 	DashboardAPIHanlder  api.DashboardAPI
+	PPDBAPIHandler       api.PPDBAPI
 }
 
 func main() {
@@ -125,6 +126,7 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 	facilityAPIHandler := api.NewFacilityAPI(facilityService)
 	batchAPIHandler := api.NewBatchAPI(batchService)
 	dashboardAPIHanlder := api.NewDashboardAPI(dashboardService)
+	ppdbAPIHandler := api.NewPPDBAPI(studentService)
 
 	apiHandler := APIHandler{
 		UserAPIHandler:       userAPIHandler,
@@ -135,6 +137,7 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 		FacilityAPIHandler:   facilityAPIHandler,
 		BatchAPIHandler:      batchAPIHandler,
 		DashboardAPIHanlder:  dashboardAPIHanlder,
+		PPDBAPIHandler:       ppdbAPIHandler,
 	}
 
 	// ROUTES //
@@ -153,7 +156,7 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 	// PPDB routes
 	ppdb := r.Group("/ppdb")
 	{
-		ppdb.POST("/add", apiHandler.StudentAPIHandler.CreateStudent)
+		ppdb.POST("/add", apiHandler.PPDBAPIHandler.Register)
 	}
 
 	// Student routes
@@ -167,7 +170,7 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 		student.PUT("/update/:id", apiHandler.StudentAPIHandler.UpdateStudent)
 		student.DELETE("/delete/:id", apiHandler.StudentAPIHandler.DeleteStudent)
 
-		student.GET("/batch/:year", apiHandler.StudentAPIHandler.GetStudentsByBatchYear)
+
 
 	}
 

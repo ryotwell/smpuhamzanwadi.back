@@ -296,7 +296,7 @@ type Curriculum struct {
 type Batch struct {
 	ID        int        `gorm:"primaryKey" json:"id"`
 	Name      string     `json:"name"`
-	Year      int        `json:"year"`
+	Jalur     string     `json:"jalur"` // PRESTASI / REGULER
 	IsActive  *bool      `json:"is_active" gorm:"default:false"`
 	StartDate *time.Time `json:"start_date"`
 	EndDate   *time.Time `json:"end_date"`
