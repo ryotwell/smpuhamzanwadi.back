@@ -32,6 +32,8 @@ type APIHandler struct {
 	BatchAPIHandler      api.BatchAPI
 	DashboardAPIHanlder  api.DashboardAPI
 	PPDBAPIHandler       api.PPDBAPI
+	RequirementAPIHandler api.RequirementAPI
+	FaqAPIHandler        api.FaqAPI
 }
 
 func main() {
@@ -79,8 +81,12 @@ func main() {
 
 	// Migration
 	conn.AutoMigrate(
-		&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Curriculum{}, &model.Facility{}, &model.Batch{},
+		&model.User{}, &model.Student{}, &model.Parent{}, &model.Post{}, &model.Curriculum{}, &model.Facility{}, &model.Batch{}, &model.Requirement{}, &model.Faq{},
 	)
+	
+	// Seed
+	SeedRequirements(conn)
+	SeedFaqs(conn)
 
 	// Route
 	router = RunServer(router, conn)
@@ -108,6 +114,8 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 	curriculumRepo := repo.NewCurriculumRepository(dbConn)
 	facilityRepo := repo.NewFacilityRepository(dbConn)
 	batchRepo := repo.NewBatchRepository(dbConn)
+	requirementRepo := repo.NewRequirementRepository(dbConn)
+	faqRepo := repo.NewFaqRepository(dbConn)
 
 	userService := service.NewUserService(userRepo)
 	studentService := service.NewStudentService(studentRepo, parentRepo, batchRepo)
@@ -117,6 +125,8 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 	facilityService := service.NewfacilityService(facilityRepo)
 	batchService := service.NewBatchService(batchRepo)
 	dashboardService := service.NewDashboardService(studentRepo, postRepo, batchRepo)
+	requirementService := service.NewRequirementService(requirementRepo)
+	faqService := service.NewFaqService(faqRepo)
 
 	userAPIHandler := api.NewUserAPI(userService)
 	studentAPIHandler := api.NewStudentAPI(studentService)
@@ -127,6 +137,8 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 	batchAPIHandler := api.NewBatchAPI(batchService)
 	dashboardAPIHanlder := api.NewDashboardAPI(dashboardService)
 	ppdbAPIHandler := api.NewPPDBAPI(studentService)
+	requirementAPIHandler := api.NewRequirementAPI(requirementService)
+	faqAPIHandler := api.NewFaqAPI(faqService)
 
 	apiHandler := APIHandler{
 		UserAPIHandler:       userAPIHandler,
@@ -138,6 +150,8 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 		BatchAPIHandler:      batchAPIHandler,
 		DashboardAPIHanlder:  dashboardAPIHanlder,
 		PPDBAPIHandler:       ppdbAPIHandler,
+		RequirementAPIHandler: requirementAPIHandler,
+		FaqAPIHandler:        faqAPIHandler,
 	}
 
 	// ROUTES //
@@ -240,5 +254,69 @@ func RunServer(r *gin.Engine, conn *gorm.DB) *gin.Engine {
 		dashboard.GET("/", apiHandler.DashboardAPIHanlder.GetDashboard)
 	}
 
+	// Requirement routes
+	requirement := r.Group("/requirement")
+	{
+		requirement.GET("/get-all", apiHandler.RequirementAPIHandler.GetAll)
+		requirement.GET("/get/:id", apiHandler.RequirementAPIHandler.GetByID)
+
+		requirement.Use(middleware.Auth())
+		requirement.POST("/add", apiHandler.RequirementAPIHandler.Create)
+		requirement.PUT("/update/:id", apiHandler.RequirementAPIHandler.Update)
+		requirement.DELETE("/delete/:id", apiHandler.RequirementAPIHandler.Delete)
+	}
+
+	// Faq routes
+	faq := r.Group("/faq")
+	{
+		faq.GET("/get-all", apiHandler.FaqAPIHandler.GetAll)
+		faq.GET("/get/:id", apiHandler.FaqAPIHandler.GetByID)
+
+		faq.Use(middleware.Auth())
+		faq.POST("/add", apiHandler.FaqAPIHandler.Create)
+		faq.PUT("/update/:id", apiHandler.FaqAPIHandler.Update)
+		faq.DELETE("/delete/:id", apiHandler.FaqAPIHandler.Delete)
+	}
+
 	return r
+}
+
+func SeedRequirements(db *gorm.DB) {
+	var count int64
+	db.Model(&model.Requirement{}).Count(&count)
+	if count > 0 {
+		return
+	}
+
+	requirements := []model.Requirement{
+		{Description: "Mengisi formulir pendaftaran."},
+		{Description: "Foto copy paspor ukuran 3x4 (2 lembar)."},
+		{Description: "Fotokopi Akta Kelahiran."},
+		{Description: "Fotokopi Kartu Keluarga (KK)."},
+		{Description: "Sertifikat Prestasi (Jika ada)."},
+	}
+
+	for _, req := range requirements {
+		db.Create(&req)
+	}
+	fmt.Println("✅ Default requirements seeded")
+}
+
+func SeedFaqs(db *gorm.DB) {
+	var count int64
+	db.Model(&model.Faq{}).Count(&count)
+	if count > 0 {
+		return
+	}
+
+	faqs := []model.Faq{
+		{Question: "Apakah ada tes masuk?", Answer: "Ya, terdapat tes potensi akademik dan wawancara untuk calon siswa dan orang tua."},
+		{Question: "Apakah menyediakan beasiswa?", Answer: "Kami menyediakan beasiswa prestasi dan beasiswa bagi siswa kurang mampu yang memenuhi syarat."},
+		{Question: "Berapa biaya pendaftarannya?", Answer: "Biaya pendaftaran dapat dilihat pada menu rincian biaya saat mengisi formulir."},
+	}
+
+	for _, faq := range faqs {
+		db.Create(&faq)
+	}
+	fmt.Println("✅ Default faqs seeded")
 }

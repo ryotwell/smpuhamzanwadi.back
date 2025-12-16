@@ -305,3 +305,24 @@ type Batch struct {
 
 	Students []Student `json:"students"`
 }
+
+// ======================
+// REQUIREMENT
+// ======================
+type Requirement struct {
+	ID          int       `gorm:"primaryKey" json:"id"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// ======================
+// FAQ
+// ======================
+type Faq struct {
+	ID        int       `gorm:"primaryKey" json:"id"`
+	Question  string    `json:"question"`
+	Answer    string    `json:"answer"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
