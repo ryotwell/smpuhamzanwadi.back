@@ -159,7 +159,8 @@ func (u *userAPI) Login(c *gin.Context) {
 	}
 
 	// Save token to cookie
-	c.SetCookie("session_token", *token, int((12 * time.Hour).Seconds()), "/", "", false, true)
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("session_token", *token, int((12 * time.Hour).Seconds()), "/", "", true, true)
 
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
@@ -178,7 +179,7 @@ func (u *userAPI) Login(c *gin.Context) {
 // LOGOUT
 // ====================
 func (u *userAPI) Logout(c *gin.Context) {
-
+	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie(
 		"session_token",
 		"",
