@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"os"
 	"project_sdu/model"
 	"project_sdu/service"
 	"time"
@@ -159,8 +160,16 @@ func (u *userAPI) Login(c *gin.Context) {
 	}
 
 	// Save token to cookie
-	c.SetSameSite(http.SameSiteNoneMode)
-	c.SetCookie("session_token", *token, int((12 * time.Hour).Seconds()), "/", "", true, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "session_token",
+		Value:    *token,
+		Path:     "/",
+		Domain:   os.Getenv("COOKIE_DOMAIN"),
+		MaxAge:   int((12 * time.Hour).Seconds()),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
@@ -179,16 +188,16 @@ func (u *userAPI) Login(c *gin.Context) {
 // LOGOUT
 // ====================
 func (u *userAPI) Logout(c *gin.Context) {
-	c.SetSameSite(http.SameSiteNoneMode)
-	c.SetCookie(
-		"session_token",
-		"",
-		-1,
-		"/",
-		"",
-		true,
-		true,
-	)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Path:     "/",
+		Domain:   os.Getenv("COOKIE_DOMAIN"),
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	c.JSON(http.StatusOK, model.SuccessResponse{
 		Success: true,
