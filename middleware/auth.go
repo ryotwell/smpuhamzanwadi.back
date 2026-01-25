@@ -10,23 +10,25 @@ import (
 
 func Auth() gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
+		tokenString := ""
 		cookie, err := ctx.Cookie("session_token")
-		if err != nil {
-			// if ctx.GetHeader("Content-Type") == "application/json" {
-			// 	ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-			// } else {
-			// 	ctx.Redirect(http.StatusSeeOther, "/login")
-			// }
-			// ctx.Abort()
-			// return
+		if err == nil {
+			tokenString = cookie
+		} else {
+			authHeader := ctx.GetHeader("Authorization")
+			if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+				tokenString = authHeader[7:]
+			}
+		}
 
+		if tokenString == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			ctx.Abort()
 			return
 		}
 
 		claims := &model.Claims{}
-		token, err := jwt.ParseWithClaims(cookie, claims, func(t *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 			return model.JwtKey, nil
 		})
 		if err != nil {

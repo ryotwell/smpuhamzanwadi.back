@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -170,6 +169,7 @@ func (u *userAPI) Login(c *gin.Context) {
 			"user_id":  user.ID,
 			"email":    user.Email,
 			"fullname": user.Fullname,
+			"token":    *token,
 		},
 	})
 }
@@ -200,36 +200,17 @@ func (u *userAPI) Logout(c *gin.Context) {
 // GET USER PROFILE
 // ====================
 func (u *userAPI) GetUserProfile(c *gin.Context) {
-	cookie, err := c.Cookie("session_token")
-	if err != nil {
+	userID, exists := c.Get("id")
+	if !exists {
 		c.JSON(http.StatusUnauthorized, model.ErrorResponse{
 			Success: false,
 			Status:  http.StatusUnauthorized,
-			Message: "Unauthorized: Token missing",
+			Message: "Unauthorized",
 		})
 		return
 	}
 
-	claims := &model.Claims{}
-	token, err := jwt.ParseWithClaims(cookie, claims, func(t *jwt.Token) (interface{}, error) {
-		return model.JwtKey, nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
-		}
-		return
-	}
-
-	if !token.Valid {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		c.Abort()
-		return
-	}
-
-	user, err := u.userService.GetUserByID(claims.UserID)
+	user, err := u.userService.GetUserByID(userID.(int))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Success: false,
@@ -245,7 +226,7 @@ func (u *userAPI) GetUserProfile(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Retrived user profile succesfully",
 		Data: gin.H{
-			"user_id":  claims.UserID,
+			"user_id":  user.ID,
 			"email":    user.Email,
 			"fullname": user.Fullname,
 		},
